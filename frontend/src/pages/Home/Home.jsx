@@ -8,7 +8,7 @@ const Home = () => {
     const navigate = useNavigate();
 
     function startRegister() {
-        navigate('/register');
+        navigate('/authenticate');
     }
 
     return (
@@ -21,7 +21,7 @@ const Home = () => {
                 </p>
 
                 <div>
-                    <Button onClick={startRegister} text="Get your username" />
+                    <Button onClick={startRegister} text="Let Go" />
                 </div>
 
                 <div className={styles.signinWrapper}>
@@ -29,12 +29,12 @@ const Home = () => {
                         Have an invite text?
                     </span>
 
-                    <Link
+                    {/* <Link
                         to="/login"
                         className="text-[#0077ff] font-bold ml-2 no-underline hover:underline hover:text-orange-300 transition duration-200"
                     >
                         Sign in
-                    </Link>
+                    </Link> */}
                 </div>
             </Card>
         </div>
