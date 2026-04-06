@@ -51,7 +51,7 @@ io.on('connection', (socket) => {
         socketUserMap.set(socket.id, user);
 
         const clients = Array.from(io.sockets.adapter.rooms.get(roomId) || []);
-
+        
         clients.forEach((clientId) => {
             io.to(clientId).emit(ACTIONS.ADD_PEER, {
                 peerId: socket.id,
@@ -66,7 +66,9 @@ io.on('connection', (socket) => {
             });
         });
 
+
         socket.join(roomId);
+        console.log(`Clients: ${clients}`); // to see the clients in the socket connection
     });
 
     socket.on(ACTIONS.RELAY_ICE, ({ peerId, icecandidate }) => {
