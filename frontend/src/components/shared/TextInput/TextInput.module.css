@@ -8,3 +8,6 @@
     border-radius: 10px;
     outline: none;
 }
+.fullWidth {
+    width: 100%;
+}

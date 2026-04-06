@@ -1,9 +1,9 @@
 import React from 'react';
 import styles from './TextInput.module.css';
 
-const TextInput = (props) => {
+const TextInput = ({ fullwidth, ...props }) => {
     return (
-        <div>
+        <div className={fullwidth ? styles.fullWidth : ''}>
             <input className={styles.input} type="text" {...props} />
         </div>
     );

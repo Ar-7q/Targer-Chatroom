@@ -16,7 +16,11 @@ module.exports = async function (req, res, next) {
 
         req.user = userData;
         next();
-    } catch (err) {
+    }
+
+    catch (err) {
+        console.error(err);
+
         return res.status(401).json({ message: 'Invalid token' });
     }
 };

@@ -9,17 +9,30 @@ import { setOtp } from '../../../../store/authSlice';
 // ✅ NEW IMPORT
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
+import { toast } from 'sonner';
 
 const Phone = ({ onNext }) => {
     const [phone, setPhone] = useState('');
     const dispatch = useDispatch();
 
     async function submit() {
+        if (!phone) {
+            toast.error('Phone Number is Required ❌')
+            return;
+        }
+
+        try{
         const { data } = await sendOtp({ phone }); // already includes +91
+        toast.success('OTP sent on the Number..📩')
         console.log(data);
 
         dispatch(setOtp({ phone: data.phone, hash: data.hash }));
-        onNext();
+        onNext();}
+        catch(err){
+            toast.error('Failed to send OTP ❌')
+            console.error(err);
+            
+        }
     }
 
     return (

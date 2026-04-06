@@ -9,7 +9,12 @@ const userSchema = new Schema(
             unique: true // ✅ IMPORTANT
         },
         name: { type: String },
-        avatar: { type: String },
+        avatar: {
+            type: String,
+            get: (avatar) => {
+                return avatar ? `${process.env.BASE_URL}${avatar}` : avatar;
+            },
+        },
         activated: {
             type: Boolean,
             default: false
@@ -17,6 +22,7 @@ const userSchema = new Schema(
     },
     {
         timestamps: true,
+        toJSON: { getters: true }
     }
 );
 

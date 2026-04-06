@@ -46,6 +46,7 @@ class ActivateController {
 
             return res.json({ user: new UserDto(user), auth: true });
         } catch (err) {
+            console.error(err);
             return res.status(500).json({ message: 'Something went wrong!' });
         }
     }

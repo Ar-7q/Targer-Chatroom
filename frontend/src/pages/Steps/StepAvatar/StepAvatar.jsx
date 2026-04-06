@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '../../../components/shared/Card/Card';
 import Button from '../../../components/shared/Button/Button';
 import styles from './StepAvatar.module.css';
+
 import { useSelector, useDispatch } from 'react-redux';
 import { setAvatar } from '../../../store/activateSlice';
 import { activate } from '../../../http';
 import { setAuth } from '../../../store/authSlice';
 
-const StepAvatar = ({ onNext }) => {
+import Loader from '../../../components/shared/Loader/Loader';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+
+const StepAvatar = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { name, avatar } = useSelector((state) => state.activate);
+  const { isAuth, user } = useSelector((state) => state.auth);
+
   const [image, setImage] = useState('/images/monkey-avatar.png');
+  const [loading, setLoading] = useState(false);
 
   function captureImage(e) {
     const file = e.target.files[0];
-    if (!file) return; // ✅ prevent crash
+    if (!file) return;
 
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -25,22 +35,39 @@ const StepAvatar = ({ onNext }) => {
     };
   }
 
+  // ✅ Navigation after auth update
+  useEffect(() => {
+    if (isAuth && user?.activated) {
+      navigate('/rooms');
+    }
+  }, [isAuth, user, navigate]);
+
   async function submit() {
-    if (!avatar) return; // ✅ prevent empty submit
+    if (!avatar) {
+      toast.error('Please upload an avatar..')
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const { data } = await activate({ name, avatar });
 
-      if (data.auth) {
-        dispatch(setAuth(data));
-        onNext(); // ✅ move to next step
+      if (data?.user) { // ✅ safer check
+        // dispatch(setAuth(data));
+        dispatch(setAuth({ user: data.user }));
       }
 
-      console.log(data);
+      toast.success('Your Profile Created successfully ..🎉')
     } catch (err) {
+      toast.error('Avatar upload Failed ❌')
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   }
+
+  if (loading) return <Loader message="Activation in progress..." />;
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -53,7 +80,7 @@ const StepAvatar = ({ onNext }) => {
             src={image}
             alt="avatar"
           />
-        </div> 
+        </div>
 
         <div>
           <input

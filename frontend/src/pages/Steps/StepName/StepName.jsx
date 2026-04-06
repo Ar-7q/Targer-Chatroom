@@ -5,6 +5,7 @@ import TextInput from '../../../components/shared/TextInput/TextInput';
 import { useDispatch, useSelector } from 'react-redux';
 import { setName } from '../../../store/activateSlice';
 import styles from './StepName.module.css';
+import { toast } from 'sonner';
 
 const StepName = ({ onNext }) => {
   const { name } = useSelector((state) => state.activate);
@@ -13,10 +14,18 @@ const StepName = ({ onNext }) => {
   const [fullname, setFullname] = useState(name || ''); // ✅ fallback
 
   function nextStep() {
-    if (!fullname.trim()) return; // ✅ better validation
+    if (!fullname.trim()) {
+      toast.error('Name is Required ❌');
+      return;
+    }
+
+    // toast.success('Name saved ✅');
 
     dispatch(setName(fullname.trim()));
-    onNext();
+
+    setTimeout(() => {
+      onNext();
+    }, 500); // ⏳ small delay
   }
 
   return (

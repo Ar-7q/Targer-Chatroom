@@ -6,6 +6,7 @@ import styles from './StepOtp.module.css';
 import { verifyOtp } from '../../../http';
 import { useSelector, useDispatch } from 'react-redux';
 import { setAuth } from '../../../store/authSlice';
+import { toast } from 'sonner';
 
 const StepOtp = () => {
     const [otp, setOtp] = useState('');
@@ -13,12 +14,18 @@ const StepOtp = () => {
     const { phone, hash } = useSelector((state) => state.auth.otp || {});
 
     async function submit() {
-        if (!otp) return;
+        if (!otp || !phone || !hash) {
+            toast.error('OTP Required.. ❌')
+            return;
+        }
 
         try {
             const { data } = await verifyOtp({ otp, phone, hash });
-            dispatch(setAuth(data));
+            toast.success("OTP Verified ✅");
+            // dispatch(setAuth(data));
+            dispatch(setAuth({ user: data.user }));
         } catch (err) {
+            toast.error('Invalid OTP ❌')
             console.log(err);
         }
     }

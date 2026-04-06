@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import StepName from '../Steps/StepName/StepName';
 import StepAvatar from '../Steps/StepAvatar/StepAvatar';
+import { toast } from 'sonner';
 
 const steps = {
     1: StepName,
@@ -12,6 +13,7 @@ const Activate = () => {
     const Step = steps[step];
 
     function onNext() {
+        if(step===1) toast.success('Name saved✅')
         setStep(step + 1);
     }
     return (
