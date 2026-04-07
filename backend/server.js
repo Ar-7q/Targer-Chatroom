@@ -50,8 +50,9 @@ io.on('connection', (socket) => {
     socket.on(ACTIONS.JOIN, ({ roomId, user }) => {
         socketUserMap.set(socket.id, user);
 
+
         const clients = Array.from(io.sockets.adapter.rooms.get(roomId) || []);
-        
+
         clients.forEach((clientId) => {
             io.to(clientId).emit(ACTIONS.ADD_PEER, {
                 peerId: socket.id,
@@ -65,9 +66,10 @@ io.on('connection', (socket) => {
                 user: socketUserMap.get(clientId),
             });
         });
-
-
+        
         socket.join(roomId);
+
+
         console.log(`Clients: ${clients}`); // to see the clients in the socket connection
     });
 
@@ -118,6 +120,9 @@ io.on('connection', (socket) => {
     });
 
     const leaveRoom = () => {
+
+        if (!socketUserMap.has(socket.id)) return;
+
         const rooms = Array.from(socket.rooms);
 
         rooms.forEach((roomId) => {
@@ -128,7 +133,13 @@ io.on('connection', (socket) => {
             clients.forEach((clientId) => {
                 io.to(clientId).emit(ACTIONS.REMOVE_PEER, {
                     peerId: socket.id, // ✅ FIXED
-                    userId: socketUserMap.get(socket.id)?._id, // ✅ KEEP _id HERE
+                    userId: socketUserMap.get(socket.id)?.id,
+                });
+
+                // ✅ MINIMAL ADDITION (no structure change)
+                socket.emit(ACTIONS.REMOVE_PEER, {
+                    peerId: clientId,
+                    userId: socketUserMap.get(clientId)?.id,
                 });
             });
 
