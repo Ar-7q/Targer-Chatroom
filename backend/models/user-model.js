@@ -5,8 +5,13 @@ const userSchema = new Schema(
     {
         phone: {
             type: String,
-            required: true,
-            unique: true // ✅ IMPORTANT
+            unique: true,
+            sparse: true,
+        },
+        email: {
+            type: String,
+            unique: true,
+            sparse: true,
         },
         name: { type: String },
         avatar: {

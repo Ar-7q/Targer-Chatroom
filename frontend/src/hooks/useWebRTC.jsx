@@ -251,6 +251,8 @@ export const useWebRTC = (roomId, user) => {
         clientsRef.current = clients;
     }, [clients]);
 
+
+
     useEffect(() => {
         const initChat = async () => {
             socket.current = socketInit();
@@ -264,11 +266,11 @@ export const useWebRTC = (roomId, user) => {
             // ✅ START UNMUTED (SYNC WITH UI)
             track.enabled = false;
 
-            addNewClient({ ...user, muted: false }, () => { // ✅ FIXED
+            addNewClient({ ...user, muted: true }, () => { // ✅ FIXED
                 const localElement = audioElements.current[user.id];
                 if (localElement) {
-                    localElement.volume = 1;
-                    localElement.muted = false;
+                    localElement.volume = 0;
+                    localElement.muted = true;
                     localElement.srcObject = localMediaStream.current;
                     localElement.play().catch(() => { });
                 }
@@ -352,7 +354,8 @@ export const useWebRTC = (roomId, user) => {
             }
 
             delete connections.current[peerId];
-            delete audioElements.current[peerId]; // ✅ FIXED
+            delete audioElements.current[peerId];
+
 
             setClients((list) => list.filter((c) => c.id !== userId));
         }

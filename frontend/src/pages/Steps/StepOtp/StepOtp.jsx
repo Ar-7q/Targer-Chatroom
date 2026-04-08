@@ -11,16 +11,16 @@ import { toast } from 'sonner';
 const StepOtp = () => {
     const [otp, setOtp] = useState('');
     const dispatch = useDispatch();
-    const { phone, hash } = useSelector((state) => state.auth.otp || {});
+    const { phone, email, hash } = useSelector((state) => state.auth.otp || {});
 
     async function submit() {
-        if (!otp || !phone || !hash) {
-            toast.error('OTP Required.. ❌')
+        if (!otp || !hash || (!phone && !email)) {
+            toast.error('OTP Required.. ❌');
             return;
         }
 
         try {
-            const { data } = await verifyOtp({ otp, phone, hash });
+            const { data } = await verifyOtp({ otp, phone, email, hash });
             toast.success("OTP Verified ✅");
             // dispatch(setAuth(data));
             dispatch(setAuth({ user: data.user }));
@@ -33,6 +33,10 @@ const StepOtp = () => {
     return (
         <div className={styles.cardWrapper}>
             <Card title="Enter the code we just texted you" icon="lock-emoji">
+                <p style={{ marginBottom: '10px', color: '#6b7280' }}>
+                    OTP sent to: {phone || email}
+                </p>
+
                 <TextInput
                     type="number"
                     value={otp}

@@ -1,3 +1,4 @@
+require('dotenv').config()
 const crypto = require('crypto');
 const hashService = require('./hash-service');
 
@@ -6,6 +7,9 @@ const smsAuthToken = process.env.SMS_AUTH_TOKEN;
 const twilio = require('twilio')(smsSid, smsAuthToken, {
     lazyLoading: true,
 });
+
+const { Resend } = require('resend')
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 class OtpService {
     async generateOtp() {
@@ -18,6 +22,27 @@ class OtpService {
             to: phone,
             from: process.env.SMS_FROM_NUMBER,
             body: `Your codershouse OTP is ${otp}`,
+        });
+    }
+
+    // ✅ NEW
+    // async sendByEmail(email, otp) {
+    //     console.log(`📧 OTP for ${email}: ${otp}`);
+    //     return true;
+    // }
+
+
+    async sendByEmail(email, otp) {
+        return await resend.emails.send({
+            from: process.env.EMAIL_FROM,
+            to: email,
+            subject: 'Your OTP Code',
+            html: `
+            <div style="font-family:sans-serif">
+                <h2>Your OTP is: ${otp}</h2>
+                <p>This OTP expires in 2 minutes.</p>
+            </div>
+        `,
         });
     }
 

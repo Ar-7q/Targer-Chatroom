@@ -4,40 +4,86 @@ const userService = require('../services/user-service');
 const tokenService = require('../services/token-service');
 const UserDto = require('../dtos/user-dto');
 
-class AuthController {
-    async sendOtp(req, res) {
-        const { phone } = req.body;
+const arcjet = require('@arcjet/node').default;
 
-        if (!phone) {
-            return res.status(400).json({ message: 'Phone field is required!' });
+const aj = arcjet({
+    key: process.env.ARCJET_KEY,
+    rules: [
+        {
+            name: "tokenBucket",
+            mode: "LIVE",
+            refillRate: 1,
+            interval: 30,
+            capacity: 1,
+        },
+    ],
+});
+
+class AuthController {
+
+    async sendOtp(req, res) {
+
+        // ✅ Arcjet protection
+        const decision = await aj.protect(req);
+
+        if (decision.isDenied()) {
+            return res.status(429).json({
+                message: "Too many requests 🚫",
+            });
         }
+
+        const { phone, email } = req.body;
+
+        // ✅ Email validation
+        if (email && !email.includes('@')) {
+            return res.status(400).json({ message: 'Invalid email!' });
+        }
+
+        if (!phone && !email) {
+            return res.status(400).json({ message: 'Phone or Email required!' });
+        }
+
+        // ✅ Normalize email
+        const normalizedEmail = email?.toLowerCase();
+
+        const contact = phone || normalizedEmail;
 
         const otp = await otpService.generateOtp();
 
-        const ttl = 1000 * 60 * 2; // 2 min
+        const ttl = 1000 * 60 * 2;
         const expires = Date.now() + ttl;
-        const data = `${phone}.${otp}.${expires}`;
+        const data = `${contact}.${otp}.${expires}`;
         const hash = hashService.hashOtp(data);
 
         try {
-            // await otpService.sendBySms(phone, otp);
+            if (phone) await otpService.sendBySms(phone, otp);
+            if (normalizedEmail) await otpService.sendByEmail(normalizedEmail, otp);
+
             return res.json({
                 hash: `${hash}.${expires}`,
-                phone,
-                otp, // ⚠️ keep only for dev (remove in production)
+                phone: phone || '',
+                email: normalizedEmail || '',
+                otp, // remove in production
             });
+
         } catch (err) {
-            console.log(err);
+            console.error("OTP ERROR:", err);
             return res.status(500).json({ message: 'message sending failed' });
         }
     }
 
     async verifyOtp(req, res) {
-        const { otp, hash, phone } = req.body;
 
-        if (!otp || !hash || !phone) {
+        const { otp, hash, phone, email } = req.body;
+
+        if (!otp || !hash || (!phone && !email)) {
             return res.status(400).json({ message: 'All fields are required!' });
         }
+
+        // ✅ Normalize email
+        const normalizedEmail = email?.toLowerCase();
+
+        const contact = phone || normalizedEmail;
 
         const [hashedOtp, expires] = hash.split('.');
 
@@ -45,22 +91,45 @@ class AuthController {
             return res.status(400).json({ message: 'OTP expired!' });
         }
 
-        const data = `${phone}.${otp}.${expires}`;
+        // ✅ OTP Attempt Limit
+        const attempts = global.otpAttempts || (global.otpAttempts = {});
+        const key = contact;
+
+        if (!attempts[key]) attempts[key] = 0;
+
+        if (attempts[key] >= 5) {
+            return res.status(429).json({ message: 'Too many attempts ❌' });
+        }
+
+        const data = `${contact}.${otp}.${expires}`;
         const isValid = otpService.verifyOtp(hashedOtp, data);
 
         if (!isValid) {
+            attempts[key]++;
             return res.status(400).json({ message: 'Invalid OTP' });
         }
 
+        // ✅ reset attempts on success
+        delete attempts[key];
+
         let user;
+
         try {
-            user = await userService.findUser({ phone });
+            // ✅ Improved user creation
+            user = await userService.findUser(
+                phone ? { phone } : { email: normalizedEmail }
+            );
 
             if (!user) {
-                user = await userService.createUser({ phone });
+                const userData = {};
+
+                if (phone) userData.phone = phone;
+                if (normalizedEmail) userData.email = normalizedEmail;
+
+                user = await userService.createUser(userData);
             }
         } catch (err) {
-            console.log(err);
+            console.error(err);
             return res.status(500).json({ message: 'Db error' });
         }
 
@@ -71,14 +140,19 @@ class AuthController {
 
         await tokenService.storeRefreshToken(refreshToken, user._id);
 
+        // ✅ Cookie security improved
         res.cookie('refreshToken', refreshToken, {
             maxAge: 1000 * 60 * 60 * 24 * 30,
             httpOnly: true,
+            sameSite: 'lax',
+            secure: false, // change to true in production (HTTPS)
         });
 
         res.cookie('accessToken', accessToken, {
             maxAge: 1000 * 60 * 60 * 24 * 30,
             httpOnly: true,
+            sameSite: 'lax',
+            secure: false, // change to true in production
         });
 
         const userDto = new UserDto(user);
@@ -86,13 +160,11 @@ class AuthController {
         return res.json({ user: userDto, auth: true });
     }
 
-    // ================= ADDED =================
-
     async refresh(req, res) {
         const { refreshToken: refreshTokenFromCookie } = req.cookies;
 
         if (!refreshTokenFromCookie) {
-            return res.status(401).json({ message: 'No token' }); // ✅ ADDED safety
+            return res.status(401).json({ message: 'No token' });
         }
 
         let userData;
@@ -102,7 +174,6 @@ class AuthController {
             );
         } catch (err) {
             console.error(err);
-
             return res.status(401).json({ message: 'Invalid Token' });
         }
 
@@ -117,7 +188,6 @@ class AuthController {
             }
         } catch (err) {
             console.error(err);
-
             return res.status(500).json({ message: 'Internal error' });
         }
 
@@ -135,19 +205,21 @@ class AuthController {
             await tokenService.updateRefreshToken(userData._id, refreshToken);
         } catch (err) {
             console.error(err);
-
             return res.status(500).json({ message: 'Internal error' });
         }
 
         res.cookie('refreshToken', refreshToken, {
             maxAge: 1000 * 60 * 60 * 24 * 30,
             httpOnly: true,
-            sameSite: 'lax'
+            sameSite: 'lax',
+            secure: false,
         });
 
         res.cookie('accessToken', accessToken, {
             maxAge: 1000 * 60 * 60 * 24 * 30,
             httpOnly: true,
+            sameSite: 'lax',
+            secure: false,
         });
 
         const userDto = new UserDto(user);
