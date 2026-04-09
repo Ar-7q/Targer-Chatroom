@@ -26,6 +26,18 @@ class AuthController {
         // ✅ Arcjet protection
         const decision = await aj.protect(req);
 
+        const otpCooldown = global.otpCooldown || (global.otpCooldown = {});
+
+        const contactKey = req.body.email || req.body.phone;
+
+        if (otpCooldown[contactKey] && Date.now() - otpCooldown[contactKey] < 30000) {
+            return res.status(429).json({
+                message: "Wait 30 seconds before requesting another OTP",
+            });
+        }
+
+        otpCooldown[contactKey] = Date.now();
+
         if (decision.isDenied()) {
             return res.status(429).json({
                 message: "Too many requests 🚫",
@@ -123,8 +135,17 @@ class AuthController {
             if (!user) {
                 const userData = {};
 
-                if (phone) userData.phone = phone;
-                if (normalizedEmail) userData.email = normalizedEmail;
+                if (phone) {
+                    userData.phone = phone;
+                }
+
+                if (normalizedEmail) {
+                    userData.email = normalizedEmail;
+                }
+
+                // 🔥 EXTRA SAFETY (VERY IMPORTANT)
+                if (!phone) delete userData.phone;
+                if (!normalizedEmail) delete userData.email;
 
                 user = await userService.createUser(userData);
             }

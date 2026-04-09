@@ -18,6 +18,14 @@ class RoomDto {
                 avatar: speaker.avatar,
             };
         });
+        this.allowedUsers = (room.allowedUsers || []).map((user) => {
+            return {
+                _id: user._id,
+                name: user.name,
+                avatar: user.avatar,
+            };
+        });
+
         this.createdAt = room.createdAt;
     }
 }

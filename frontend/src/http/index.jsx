@@ -23,7 +23,13 @@ export const logout = () => api.post('/logout');
 export const createRoom = (data) => api.post('/rooms', data);
 export const getAllRooms = () => api.get('/rooms');
 export const getRoom = (roomId) => api.get(`/rooms/${roomId}`);
+export const inviteUser = (roomId, data) => api.post(`/rooms/${roomId}/invite`, data);
 
+export const removeUser = (roomId, data) => api.post(`/rooms/${roomId}/remove`, data);
+
+export const leaveRoom = (roomId) => api.post(`/rooms/${roomId}/leave`);
+
+export const searchUsers = (query) => api.get(`/users/search?query=${query}`);
 
 //  INTERCEPTOR added in part-5
 

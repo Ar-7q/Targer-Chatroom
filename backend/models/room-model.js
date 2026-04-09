@@ -7,31 +7,32 @@ const roomSchema = new Schema(
 
         roomType: {
             type: String,
-            required: true
-            // ✅ (optional but recommended: enum)
-            
+            enum: ['open', 'social', 'private'],
+            required: true,
         },
 
         ownerId: {
             type: Schema.Types.ObjectId,
             ref: 'User',
-            required: true   // ✅ ADDED (important)
+            required: true,
         },
 
-        speakers: {
-            type: [
-                {
-                    type: Schema.Types.ObjectId,
-                    ref: 'User',
-                },
-            ],
-            default: [],
-            required:false,   // ✅ ADDED (better than undefined)
-        },
+        speakers: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+            },
+        ],
+
+        // 🔒 For private rooms
+        allowedUsers: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+            },
+        ],
     },
-    {
-        timestamps: true,
-    }
+    { timestamps: true }
 );
 
 module.exports = mongoose.model('Room', roomSchema, 'rooms');

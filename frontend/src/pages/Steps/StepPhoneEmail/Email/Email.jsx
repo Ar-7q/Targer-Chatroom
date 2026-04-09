@@ -9,26 +9,33 @@ import { setOtp } from '../../../../store/authSlice';
 import { toast } from 'sonner';
 
 const Email = ({ onNext }) => {
+
+    const [loading, setLoading] = useState(false);
+    const [disabled, setDisabled] = useState(false);
     const [email, setEmail] = useState('');
     const dispatch = useDispatch();
 
     async function submit() {
+        if (disabled) return; // 🚫 prevent spam clicks
+
         if (!email) {
             toast.error('Email is Required ❌');
             return;
         }
 
-        // simple email validation (minimal, no overengineering)
         if (!email.includes('@')) {
             toast.error('Enter a valid email ❌');
             return;
         }
 
+        setLoading(true);
+        setDisabled(true); // 🔥 disable button
+
         try {
-            const { data } = await sendOtp({ email }); // 🔥 send email instead of phone
+            const { data } = await sendOtp({ email });
             toast.success('OTP sent on Email 📩');
-            console.log('Sending OTP to-> ',email);
-            
+
+            console.log('Sending OTP to-> ', email);
             console.log(data);
 
             dispatch(setOtp({ email: data.email, hash: data.hash }));
@@ -37,6 +44,11 @@ const Email = ({ onNext }) => {
             toast.error('Failed to send OTP ❌');
             console.error(err);
         }
+
+        setLoading(false);
+
+        // ⏳ enable button after 30 sec
+        setTimeout(() => setDisabled(false), 30000);
     }
 
     return (
@@ -47,7 +59,11 @@ const Email = ({ onNext }) => {
             />
             <div>
                 <div className={styles.actionButtonWrap}>
-                    <Button text="Next" onClick={submit} />
+                    <Button
+                        text={disabled ? "Wait 30s..." : loading ? "Sending..." : "Next"}
+                        onClick={submit}
+                        disabled={disabled}
+                    />
                 </div>
                 <p className={styles.bottomParagraph}>
                     By entering your email, you’re agreeing to our Terms of

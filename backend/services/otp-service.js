@@ -8,8 +8,11 @@ const twilio = require('twilio')(smsSid, smsAuthToken, {
     lazyLoading: true,
 });
 
-const { Resend } = require('resend')
-const resend = new Resend(process.env.RESEND_API_KEY);
+// const { Resend } = require('resend')
+// const resend = new Resend(process.env.RESEND_API_KEY);
+
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 class OtpService {
     async generateOtp() {
@@ -32,18 +35,42 @@ class OtpService {
     // }
 
 
+    // RESEND EMAIL OTP VERIFICATION
+    // async sendByEmail(email, otp) {
+    //     return await resend.emails.send({
+    //         from: process.env.EMAIL_FROM,
+    //         to: email,
+    //         subject: 'Your OTP Code',
+    //         html: `
+    //         <div style="font-family:sans-serif">
+    //             <h2>Your OTP is: ${otp}</h2>
+    //             <p>This OTP expires in 2 minutes.</p>
+    //         </div>
+    //     `,
+    //     });
+    // }
+
+    //SENDGRID EMAIL OTP VERIFICATION
     async sendByEmail(email, otp) {
-        return await resend.emails.send({
-            from: process.env.EMAIL_FROM,
-            to: email,
-            subject: 'Your OTP Code',
-            html: `
-            <div style="font-family:sans-serif">
-                <h2>Your OTP is: ${otp}</h2>
-                <p>This OTP expires in 2 minutes.</p>
-            </div>
-        `,
-        });
+        try {
+            const msg = {
+                to: email,
+                from: process.env.EMAIL_FROM,
+                subject: 'Your OTP Verification Code',
+                html: `
+                <div style="font-family:sans-serif">
+                    <h2>Your OTP is: ${otp}</h2>
+                    <p>This OTP expires in 2 minutes.</p>
+                </div>
+            `,
+            };
+
+            await sgMail.send(msg);
+            return true;
+        } catch (error) {
+            console.log('SendGrid Error:', error);
+            throw error;
+        }
     }
 
     verifyOtp(hashedOtp, data) {
