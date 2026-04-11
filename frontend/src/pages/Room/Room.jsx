@@ -471,13 +471,19 @@ const Room = () => {
 
   const handManualLeave = async () => {
     try {
+
+      // 🔥 ADD THIS (MAIN FIX)
+      if (room?.ownerId?._id === user.id) {
+        socket.emit(ACTIONS.ROOM_CLOSED, { roomId });
+      }
+
       await leaveRoom(roomId);
       navigate('/rooms');
+
     } catch (e) {
       console.log(e);
     }
   };
-
   const handleRemoveUser = async (userIdToRemove) => {
     try {
       await removeUser(roomId, { userIdToRemove });
@@ -644,7 +650,7 @@ const Room = () => {
                       key={u._id}
                       onClick={() => {
                         setInviteId(u.name);
-                         // keep UI same
+                        // keep UI same
                         setQuery(u.name);
                         setSearchResults([]);
                       }}

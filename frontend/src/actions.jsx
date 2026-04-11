@@ -13,4 +13,6 @@ export const ACTIONS = {
     USER_KICKED: 'user-kicked',
     USER_JOINED: 'user-joined',
     USER_INVITED: 'user-invited',
+    ROOM_CLOSED: 'room-closed',
+    ROOM_UPDATED: 'room-updated',
 };

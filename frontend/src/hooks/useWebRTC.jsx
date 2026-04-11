@@ -296,7 +296,16 @@ export const useWebRTC = (roomId, user) => {
 
             socket.current.on(ACTIONS.USER_KICKED, () => {
                 toast.error("You were removed from the room");
-                window.location.href = "/rooms";
+                setTimeout(() => {
+                    window.location.href = "/rooms";
+                }, 1500);
+            });
+
+            socket.current.on(ACTIONS.ROOM_CLOSED, () => {
+                toast.error("Host left the room");
+                setTimeout(() => {
+                    window.location.href = "/rooms";
+                }, 1500);
             });
 
             socket.current.on(ACTIONS.USER_JOINED, ({ name }) => {
@@ -304,7 +313,7 @@ export const useWebRTC = (roomId, user) => {
             });
 
             socket.current.on(ACTIONS.USER_INVITED, () => {
-                toast.success("You have been invited to a private room");
+                alert("You have been invited to a private room");
             });
 
 

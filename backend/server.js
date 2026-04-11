@@ -166,6 +166,14 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on(ACTIONS.ROOM_CLOSED, ({ roomId }) => {
+        const clients = Array.from(io.sockets.adapter.rooms.get(roomId) || []);
+
+        clients.forEach((clientId) => {
+            io.to(clientId).emit(ACTIONS.ROOM_CLOSED);
+        });
+    });
+
     const leaveRoom = () => {
 
         if (!socketUserMap.has(socket.id)) return;
