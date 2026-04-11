@@ -10,6 +10,9 @@ const ACTIONS = {
     MUTE: 'mute',
     UNMUTE: 'unmute',
     MUTE_INFO: 'mute-info',
+    USER_KICKED: 'user-kicked',
+    USER_JOINED: 'user-joined',
+    USER_INVITED: 'user-invited',
 };
 
 module.exports = ACTIONS;

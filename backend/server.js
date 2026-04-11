@@ -66,8 +66,21 @@ io.on('connection', (socket) => {
                 user: socketUserMap.get(clientId),
             });
         });
-        
+
         socket.join(roomId);
+        // 🔥 notify others (owner will also receive)
+        // 🔥 NOTIFY OTHERS THAT USER JOINED
+        const updatedClients = Array.from(io.sockets.adapter.rooms.get(roomId) || []);
+
+        updatedClients.forEach((clientId) => {
+            if (clientId !== socket.id) {
+                io.to(clientId).emit(ACTIONS.USER_JOINED, {
+                    name: user.name,
+                });
+            }
+        });
+
+
 
 
         console.log(`Clients: ${clients}`); // to see the clients in the socket connection
@@ -117,6 +130,40 @@ io.on('connection', (socket) => {
                 });
             }
         });
+    });
+
+    socket.on(ACTIONS.USER_KICKED, ({ userIdToRemove }) => {
+        // find socket of that user
+        let targetSocketId = null;
+
+        for (let [socketId, user] of socketUserMap.entries()) {
+            if (user.id === userIdToRemove) {
+                targetSocketId = socketId;
+                break; // 🔥 stop early
+            }
+        }
+
+        // send kick event
+        if (targetSocketId) {
+            io.to(targetSocketId).emit(ACTIONS.USER_KICKED);
+        }
+    });
+
+    socket.on(ACTIONS.USER_INVITED, ({ userIdToInvite, roomId }) => {
+        let targetSocketId = null;
+
+        for (let [socketId, user] of socketUserMap.entries()) {
+            if (user.id === userIdToInvite) {
+                targetSocketId = socketId;
+                break;
+            }
+        }
+
+        if (targetSocketId) {
+            io.to(targetSocketId).emit(ACTIONS.USER_INVITED, {
+                roomId,
+            });
+        }
     });
 
     const leaveRoom = () => {

@@ -47,8 +47,8 @@ class RoomService {
             ]
         })
             .populate('speakers')
-            .populate('ownerId')
-            .populate('allowedUsers') // ✅ ADDED
+            .populate('ownerId', '_id name avatar')   // ✅ FIXED
+            .populate('allowedUsers')
             .exec();
 
         return rooms;
@@ -58,8 +58,8 @@ class RoomService {
     async getRoom(roomId, userId) {
         const room = await RoomModel.findOne({ _id: roomId })
             .populate('speakers')
-            .populate('ownerId')
-            .populate('allowedUsers'); // ✅ ADDED
+            .populate('ownerId', '_id name avatar')   // ✅ FIXED
+            .populate('allowedUsers');
 
         if (!room) return null;
 

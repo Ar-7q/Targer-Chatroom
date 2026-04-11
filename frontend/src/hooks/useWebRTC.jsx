@@ -226,6 +226,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { ACTIONS } from '../actions';
 import socketInit from '../socket';
 import { useStateWithCallback } from './useStateWithCallback';
+import { toast } from 'sonner';
 
 export const useWebRTC = (roomId, user) => {
     const [clients, setClients] = useStateWithCallback([]);
@@ -292,6 +293,20 @@ export const useWebRTC = (roomId, user) => {
             socket.current.on(ACTIONS.UNMUTE, ({ userId }) => {
                 handleSetMute(false, userId);
             });
+
+            socket.current.on(ACTIONS.USER_KICKED, () => {
+                toast.error("You were removed from the room");
+                window.location.href = "/rooms";
+            });
+
+            socket.current.on(ACTIONS.USER_JOINED, ({ name }) => {
+                toast.success(`${name} joined the room`);
+            });
+
+            socket.current.on(ACTIONS.USER_INVITED, () => {
+                toast.success("You have been invited to a private room");
+            });
+
 
             socket.current.emit(ACTIONS.JOIN, { roomId, user });
         };
