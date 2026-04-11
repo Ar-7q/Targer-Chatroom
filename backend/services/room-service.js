@@ -66,9 +66,9 @@ class RoomService {
         // 🔒 protect private rooms
         if (room.roomType === 'private') {
             const isAllowed =
-                room.ownerId._id.toString() === userId.toString() ||
+                (room.ownerId._id || room.ownerId).toString() === userId.toString() ||
                 room.allowedUsers.some(
-                    (u) => u.toString() === userId.toString()
+                    (u) => (u._id || u).toString() === userId.toString()
                 );
 
             if (!isAllowed) return null;

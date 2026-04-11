@@ -1,42 +1,3 @@
-// import React from 'react'
-// import { useSelector } from 'react-redux'
-// import { useParams } from 'react-router-dom'
-// import { useWebRTC } from '../../hooks/useWebRTC'
-
-// const Room = () => {
-
-//   const { id: roomId } = useParams()
-//   const user = useSelector((state) => state.auth.user)
-
-//   const { clients, provideRef } = useWebRTC(roomId, user)
-
-//   return (
-//     <div>
-//       <h1>
-//         All connected Clients
-//       </h1>
-
-//       {clients?.map((client, index) => {
-//         return (
-//           <div key={`${client.id}-${index}`}>
-
-//             <audio
-//               ref={(instance) => provideRef(instance, client.id)}
-//               controls autoPlay></audio>
-//             <h4>
-//               {client.name}
-//             </h4>
-//           </div>
-//         )
-//       })}
-
-//     </div>
-//   )
-// }
-
-// export default Room
-
-
 
 // FULL CODE OF ROOM.JSX
 
@@ -178,9 +139,9 @@ const Room = () => {
 
       <div className="bg-[#1d1d1d] mt-16 rounded-tl-2xl rounded-tr-2xl min-h-[calc(100vh-205px)] p-8">
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-[#2f2f2f] pb-4">
           {room && (
-            <h2 className="text-lg font-bold">
+            <h2 className="text-2xl font-extrabold text-white tracking-wide bg-gradient-to-r from-violet-400 to-purple-500 bg-clip-text text-transparent">
               {room.topic}
             </h2>
           )}
@@ -205,20 +166,22 @@ const Room = () => {
           <div className="mt-6">
             <h3 className="text-white font-bold mb-2">Invited Users</h3>
 
-            {room.allowedUsers.map((userItem) => (
-              <div key={userItem._id} className="flex justify-between mb-2">
-                <span>{userItem.name}</span>
+            {room.allowedUsers
+              .filter((userItem) => userItem._id !== room.ownerId._id)
+              .map((userItem) => (
+                <div key={userItem._id} className="flex justify-between mb-2">
+                  <span>{userItem.name}</span>
 
-                {room.ownerId._id === user.id && (
-                  <button
-                    onClick={() => handleRemoveUser(userItem._id)}
-                    className="bg-red-500 px-2 py-1 rounded"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            ))}
+                  {room.ownerId._id === user.id && userItem._id !== user.id && (
+                    <button
+                      onClick={() => handleRemoveUser(userItem._id)}
+                      className="bg-red-500 px-2 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
           </div>
         )}
 
@@ -272,12 +235,23 @@ const Room = () => {
           {clients.map((client) => {
             return (
               <div className="flex flex-col items-center" key={client.id}>
-                <div className="w-[90px] h-[90px] rounded-full border-[3px] border-[#5453e0] relative">
+                <div
+                  className={`w-[90px] h-[90px] rounded-full border-[3px] relative ${String(room?.ownerId?._id || room?.ownerId) === String(client.id)
+                    ? 'border-violet-500 shadow-[0_0_20px_#8b5cf6] animate-pulse'
+                    : 'border-[#5453e0]'
+                    }`}
+                >
                   <img
                     className="w-full h-full rounded-full object-cover"
                     src={client.avatar}
                     alt=""
                   />
+
+                  {String(room?.ownerId?._id || room?.ownerId) === String(client.id) && (
+                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-violet-600 text-white text-[10px] px-2 py-[2px] rounded-full shadow-md">
+                      HOST
+                    </span>
+                  )}
 
                   <audio
                     autoPlay
