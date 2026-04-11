@@ -29,6 +29,8 @@ export const removeUser = (roomId, data) => api.post(`/rooms/${roomId}/remove`, 
 
 export const leaveRoom = (roomId) => api.post(`/rooms/${roomId}/leave`);
 
+export const deleteRoom = (roomId) => api.delete(`/rooms/${roomId}`);
+
 export const searchUsers = (query) => api.get(`/users/search?query=${query}`);
 
 //  INTERCEPTOR added in part-5

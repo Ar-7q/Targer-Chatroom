@@ -33,7 +33,7 @@ class RoomService {
                 // 👥 SOCIAL → only created by user
                 {
                     roomType: 'social',
-                    ownerId: userId
+                    // ownerId: userId
                 },
 
                 // 🔒 PRIVATE → secure access
@@ -155,6 +155,12 @@ class RoomService {
         }
 
         return { deleted: false };
+    }
+    async findRoomById(roomId) {
+        return await RoomModel.findById(roomId);
+    }
+    async deleteRoom(roomId) {
+        return await RoomModel.findByIdAndDelete(roomId);
     }
 }
 

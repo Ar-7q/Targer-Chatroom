@@ -144,6 +144,36 @@ class RoomsController {
 
         return res.json({ message: 'Left room successfully' });
     }
+
+    async delete(req, res) {
+        try {
+            const { roomId } = req.params;
+
+            const room = await roomService.findRoomById(roomId);
+
+            if (!room) {
+                return res.status(404).json({ message: 'Room not found' });
+            }
+
+            // ✅ Only allow delete if:
+            // 1. room is social
+            // 2. user is owner
+            if (room.roomType !== 'social') {
+                return res.status(403).json({ message: 'Only social rooms can be deleted' });
+            }
+
+            if (room.ownerId.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ message: 'Not authorized' });
+            }
+
+            await roomService.deleteRoom(roomId);
+
+            return res.json({ message: 'Room deleted successfully' });
+
+        } catch (err) {
+            return res.status(500).json({ message: 'Server error' });
+        }
+    }
 }
 
 module.exports = new RoomsController();

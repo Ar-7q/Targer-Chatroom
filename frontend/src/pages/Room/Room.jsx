@@ -46,6 +46,7 @@ import { useWebRTC } from '../../hooks/useWebRTC';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getRoom, leaveRoom, removeUser, inviteUser } from '../../http';
 import { searchUsers } from '../../http'; // ⭐ ADDED
+import { toast } from 'sonner';
 
 const Room = () => {
   const user = useSelector((state) => state.auth.user);
@@ -102,7 +103,7 @@ const Room = () => {
     }
   };
 
-  // ⭐ ADDED (search function)
+  //  ADDED (search function)
   const handleSearch = async (value) => {
     setQuery(value);
     setInviteId(value); // keep compatibility with existing logic
@@ -114,7 +115,10 @@ const Room = () => {
 
     try {
       const { data } = await searchUsers(value);
-      setSearchResults(data);
+      // ✅ FILTER YOURSELF OUT
+      const filtered = data.filter((u) => u._id !== user.id);
+
+      setSearchResults(filtered);
     } catch (e) {
       console.log(e);
     }
@@ -122,22 +126,27 @@ const Room = () => {
 
   const handleInvite = async () => {
     try {
-      if (!inviteId.trim()) return;
+      if (!inviteId.trim()) {
+        toast.error('Please enter username..')
+        return;
+      }
 
       const isObjectId = /^[0-9a-fA-F]{24}$/.test(inviteId);
 
       if (isObjectId) {
-        alert('Please enter username, not user ID');
+        toast.error('Please enter username, not user ID');
         return;
       }
 
       await inviteUser(roomId, { userIdToAdd: inviteId });
 
+      toast.success('User invited successfully'); // ✅ ADDED
+
       const { data } = await getRoom(roomId);
       setRoom(data);
       setInviteId('');
-      setQuery('');          // ⭐ ADDED
-      setSearchResults([]);  // ⭐ ADDED
+      setQuery('');
+      setSearchResults([]);
     } catch (e) {
       console.log(e);
     }
