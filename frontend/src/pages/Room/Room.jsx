@@ -362,12 +362,10 @@ import { useSelector } from 'react-redux';
 import { useWebRTC } from '../../hooks/useWebRTC';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getRoom, leaveRoom, removeUser, inviteUser } from '../../http';
-import { searchUsers } from '../../http'; // ⭐ ADDED
+import { searchUsers } from '../../http';
 import { toast } from 'sonner';
 import socketInit from '../../socket';
 import { ACTIONS } from '../../actions';
-
-
 
 const Room = () => {
   const user = useSelector((state) => state.auth.user);
@@ -381,26 +379,22 @@ const Room = () => {
   const [isMuted, setMuted] = useState(true);
   const [inviteId, setInviteId] = useState('');
 
-  // ⭐ ADDED (search state)
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
-  // ✅ FETCH ROOM
   useEffect(() => {
     let isActive = true;
 
     const fetchRoom = async () => {
       try {
         const { data } = await getRoom(roomId);
-
         if (!isActive) return;
         setRoom(data);
-
       } catch (e) {
         if (e.response && e.response.status === 403) {
           isActive = false;
           navigate('/rooms');
-          return; // 🔥 STOP
+          return;
         }
       }
     };
@@ -412,58 +406,6 @@ const Room = () => {
     };
   }, [roomId]);
 
-  // useEffect(() => {
-  //   let interval;
-  //   let isActive = true;
-
-  //   const startPolling = () => {
-  //     interval = setInterval(async () => {
-  //       try {
-  //         if (!isActive) return;
-
-  //         const { data } = await getRoom(roomId);
-
-  //         if (!isActive) return;
-  //         setRoom(data);
-
-  //       } catch (e) {
-  //         if (e.response && e.response.status === 403) {
-  //           clearInterval(interval);
-  //           isActive = false;
-
-  //           toast.error("You were removed from the room");
-  //           navigate('/rooms');
-  //           return;
-  //         }
-  //       }
-  //     }, 2000);
-  //   };
-
-  //   startPolling();
-
-  //   return () => {
-  //     isActive = false;
-  //     clearInterval(interval);
-  //   };
-  // }, [roomId]);
-
-  //useEffect(() => {
-  //   if (!room || !user) return;
-
-  //   // check if current user still exists in allowedUsers
-  //   if (room.roomType === 'private') {
-  //     const stillAllowed = room.allowedUsers?.some(
-  //       (u) => u._id === user.id
-  //     );
-
-  //     // if removed → redirect
-  //     if (!stillAllowed && room.ownerId._id !== user.id) {
-  //       toast.error("You were removed from the room");
-  //       navigate('/rooms');
-  //     }
-  //   }
-  // }, [room, user]);
-
   useEffect(() => {
     if (!user) return;
     handleMute(isMuted, user.id);
@@ -471,19 +413,21 @@ const Room = () => {
 
   const handManualLeave = async () => {
     try {
-
-      // 🔥 ADD THIS (MAIN FIX)
-      if (room?.ownerId?._id === user.id) {
+      // ✅ FIX: Only close for private & social
+      if (
+        room?.ownerId?._id === user.id &&
+        (room?.roomType === 'private' || room?.roomType === 'social')
+      ) {
         socket.emit(ACTIONS.ROOM_CLOSED, { roomId });
       }
-
+      toast.success('You have exited successfully from the room...')
       await leaveRoom(roomId);
       navigate('/rooms');
-
     } catch (e) {
       console.log(e);
     }
   };
+
   const handleRemoveUser = async (userIdToRemove) => {
     try {
       await removeUser(roomId, { userIdToRemove });
@@ -497,10 +441,9 @@ const Room = () => {
     }
   };
 
-  //  ADDED (search function)
   const handleSearch = async (value) => {
     setQuery(value);
-    setInviteId(value); // keep compatibility with existing logic
+    setInviteId(value);
 
     if (!value.trim()) {
       setSearchResults([]);
@@ -509,9 +452,7 @@ const Room = () => {
 
     try {
       const { data } = await searchUsers(value);
-      // ✅ FILTER YOURSELF OUT
       const filtered = data.filter((u) => u._id !== user.id);
-
       setSearchResults(filtered);
     } catch (e) {
       console.log(e);
@@ -521,7 +462,7 @@ const Room = () => {
   const handleInvite = async () => {
     try {
       if (!inviteId.trim()) {
-        toast.error('Please enter username..')
+        toast.error('Please enter username..');
         return;
       }
 
@@ -537,9 +478,9 @@ const Room = () => {
       socket.emit(ACTIONS.USER_INVITED, {
         userIdToInvite: inviteId,
         roomId,
-      }); //SOCKET id added to invite
+      });
 
-      toast.success('User invited successfully'); // ✅ ADDED
+      toast.success('User invited successfully');
 
       const { data } = await getRoom(roomId);
       setRoom(data);
@@ -610,14 +551,17 @@ const Room = () => {
                 <div key={userItem._id} className="flex justify-between mb-2">
                   <span>{userItem.name}</span>
 
-                  {room.ownerId._id === user.id && userItem._id !== user.id && (
-                    <button
-                      onClick={() => handleRemoveUser(userItem._id)}
-                      className="bg-red-500 px-2 py-1 rounded"
-                    >
-                      Remove
-                    </button>
-                  )}
+                  {/* ✅ FIX: remove only in private/social */}
+                  {(room.roomType === 'private' || room.roomType === 'social') &&
+                    room.ownerId._id === user.id &&
+                    userItem._id !== user.id && (
+                      <button
+                        onClick={() => handleRemoveUser(userItem._id)}
+                        className="bg-red-500 px-2 py-1 rounded"
+                      >
+                        Remove
+                      </button>
+                    )}
                 </div>
               ))}
           </div>
@@ -642,7 +586,6 @@ const Room = () => {
                 Invite
               </button>
 
-              {/* ⭐ DROPDOWN */}
               {searchResults.length > 0 && (
                 <div className="absolute top-[50px] left-0 bg-[#1f1f1f] w-[250px] rounded border border-gray-700 z-10">
                   {searchResults.map((u) => (
@@ -650,17 +593,12 @@ const Room = () => {
                       key={u._id}
                       onClick={() => {
                         setInviteId(u.name);
-                        // keep UI same
                         setQuery(u.name);
                         setSearchResults([]);
                       }}
                       className="flex items-center gap-2 p-2 cursor-pointer hover:bg-[#333]"
                     >
-                      <img
-                        src={u.avatar}
-                        className="w-6 h-6 rounded-full"
-                        alt=""
-                      />
+                      <img src={u.avatar} className="w-6 h-6 rounded-full" alt="" />
                       <span className="text-white">{u.name}</span>
                     </div>
                   ))}
@@ -675,9 +613,15 @@ const Room = () => {
             return (
               <div className="flex flex-col items-center" key={client.id}>
                 <div
-                  className={`w-[90px] h-[90px] rounded-full border-[3px] relative ${(room?.ownerId?._id || room?.ownerId) === client.id
-                    ? 'border-violet-500 shadow-[0_0_20px_#8b5cf6] animate-pulse'
-                    : 'border-[#5453e0]'
+                  className={`w-[90px] h-[90px] rounded-full border-[3px] relative 
+                  ${client.muted
+                      ? 'border-[#5453e0]'
+                      : 'border-green-400 shadow-[0_0_20px_#22c55e]'
+                    }
+                  ${room?.roomType !== 'public' &&
+                      (room?.ownerId?._id || room?.ownerId) === client.id
+                      ? 'border-violet-500 shadow-[0_0_20px_#8b5cf6] animate-pulse'
+                      : ''
                     }`}
                 >
                   <img
@@ -686,11 +630,13 @@ const Room = () => {
                     alt=""
                   />
 
-                  {(room?.ownerId?._id || room?.ownerId) === client.id && (
-                    <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-violet-600 text-white text-[10px] px-2 py-[2px] rounded-full shadow-md">
-                      HOST
-                    </span>
-                  )}
+                  {/* ✅ FIX: Host only in private/social */}
+                  {(room?.roomType === 'private' || room?.roomType === 'social') &&
+                    (room?.ownerId?._id || room?.ownerId) === client.id && (
+                      <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-violet-600 text-white text-[10px] px-2 py-[2px] rounded-full shadow-md">
+                        HOST
+                      </span>
+                    )}
 
                   <audio
                     autoPlay
@@ -723,7 +669,6 @@ const Room = () => {
 };
 
 export default Room;
-
 
 
 
