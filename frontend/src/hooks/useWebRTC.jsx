@@ -267,7 +267,7 @@ export const useWebRTC = (roomId, user) => {
             // ✅ START UNMUTED (SYNC WITH UI)
             track.enabled = false;
 
-            addNewClient({ ...user, muted: true }, () => { // ✅ FIXED
+            addNewClient({ ...user, muted: true, handRaised: false }, () => { // ✅ FIXED
                 const localElement = audioElements.current[user.id];
                 if (localElement) {
                     localElement.volume = 0;
@@ -312,8 +312,26 @@ export const useWebRTC = (roomId, user) => {
                 toast.success(`${name} joined the room`);
             });
 
-            socket.current.on(ACTIONS.USER_INVITED, () => {
-                alert("You have been invited to a private room");
+            // socket.current.on(ACTIONS.USER_INVITED, () => {
+            // alert("You have been invited to a private room");
+            // });
+
+            // ⭐ RAISE HAND
+            socket.current.on(ACTIONS.RAISE_HAND, ({ userId }) => {
+                setClients((clients) =>
+                    clients.map((c) =>
+                        c.id === userId ? { ...c, handRaised: true } : c
+                    )
+                );
+            });
+
+            // ⭐ LOWER HAND
+            socket.current.on(ACTIONS.LOWER_HAND, ({ userId }) => {
+                setClients((clients) =>
+                    clients.map((c) =>
+                        c.id === userId ? { ...c, handRaised: false } : c
+                    )
+                );
             });
 
 
@@ -342,7 +360,7 @@ export const useWebRTC = (roomId, user) => {
             };
 
             connections.current[peerId].ontrack = ({ streams: [remoteStream] }) => {
-                addNewClient({ ...remoteUser, muted: true }, () => {
+                addNewClient({ ...remoteUser, muted: true, handRaised: false }, () => {
                     const audio = audioElements.current[remoteUser.id];
 
                     if (audio) {
@@ -492,5 +510,16 @@ export const useWebRTC = (roomId, user) => {
         }
     };
 
-    return { clients, provideRef, handleMute };
+
+
+    const toggleHand = () => {
+        const current = clientsRef.current.find(c => c.id === user.id)?.handRaised;
+
+        socket.current.emit(
+            current ? ACTIONS.LOWER_HAND : ACTIONS.RAISE_HAND,
+            { roomId }
+        );
+    };
+
+    return { clients, provideRef, handleMute, toggleHand };
 };

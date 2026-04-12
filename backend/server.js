@@ -44,6 +44,8 @@ const ACTIONS = require('./actions'); // ✅ FIXED FILE NAME
 
 const socketUserMap = new Map();
 
+const handRaiseMap = new Map(); // ⭐ ADD THIS for raise hand feature
+
 io.on('connection', (socket) => {
     console.log('✅ New connection:', socket.id); // ✅ FIXED
 
@@ -68,6 +70,18 @@ io.on('connection', (socket) => {
         });
 
         socket.join(roomId);
+
+        //added the raise hand feature
+
+        // ⭐ sync raised hands to new user
+        clients.forEach((clientId) => {
+            if (handRaiseMap.get(clientId)) {
+                socket.emit(ACTIONS.RAISE_HAND, {
+                    userId: socketUserMap.get(clientId)?.id,
+                });
+            }
+        });
+
         // 🔥 notify others (owner will also receive)
         // 🔥 NOTIFY OTHERS THAT USER JOINED
         const updatedClients = Array.from(io.sockets.adapter.rooms.get(roomId) || []);
@@ -121,6 +135,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on(ACTIONS.MUTE_INFO, ({ userId, roomId, isMute }) => {
+
+
         const clients = Array.from(io.sockets.adapter.rooms.get(roomId) || []);
         clients.forEach((clientId) => {
             if (clientId !== socket.id) {
@@ -131,6 +147,30 @@ io.on('connection', (socket) => {
             }
         });
     });
+
+    socket.on(ACTIONS.RAISE_HAND, ({ roomId }) => {
+        handRaiseMap.set(socket.id, true);
+
+        const clients = Array.from(io.sockets.adapter.rooms.get(roomId) || []);
+
+        clients.forEach((clientId) => {
+            io.to(clientId).emit(ACTIONS.RAISE_HAND, {
+                userId: socketUserMap.get(socket.id)?.id,
+            });
+        });
+    });//raise hand
+
+    socket.on(ACTIONS.LOWER_HAND, ({ roomId }) => {
+        handRaiseMap.set(socket.id, false);
+
+        const clients = Array.from(io.sockets.adapter.rooms.get(roomId) || []);
+
+        clients.forEach((clientId) => {
+            io.to(clientId).emit(ACTIONS.LOWER_HAND, {
+                userId: socketUserMap.get(socket.id)?.id,
+            });
+        });
+    });//lower hand
 
     socket.on(ACTIONS.USER_KICKED, ({ userIdToRemove }) => {
         // find socket of that user
@@ -202,6 +242,7 @@ io.on('connection', (socket) => {
         });
 
         socketUserMap.delete(socket.id); // ✅ FIXED
+        handRaiseMap.delete(socket.id); // ⭐ ADD THIS
     };
 
     socket.on(ACTIONS.LEAVE, leaveRoom);

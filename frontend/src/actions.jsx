@@ -15,4 +15,6 @@ export const ACTIONS = {
     USER_INVITED: 'user-invited',
     ROOM_CLOSED: 'room-closed',
     ROOM_UPDATED: 'room-updated',
+    RAISE_HAND: 'raise-hand',
+    LOWER_HAND: 'lower-hand',
 };
