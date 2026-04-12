@@ -29,6 +29,8 @@ const Room = () => {
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
+  const [showInvitedModal, setShowInvitedModal] = useState(false);
+
   useEffect(() => {
     let isActive = true;
 
@@ -195,31 +197,42 @@ const Room = () => {
         </div>
 
         {/* INVITED USERS */}
-        {room?.roomType === 'private' && room?.allowedUsers && (
-          <div className="mt-6">
-            <h3 className="text-white font-bold mb-2">Invited Users</h3>
 
-            {room.allowedUsers
-              .filter((userItem) => userItem._id !== room.ownerId._id)
-              .map((userItem) => (
-                <div key={userItem._id} className="flex justify-between mb-2">
-                  <span>{userItem.name}</span>
 
-                  {/* ✅ FIX: remove only in private/social */}
-                  {(room.roomType === 'private' || room.roomType === 'social') &&
-                    room.ownerId._id === user.id &&
-                    userItem._id !== user.id && (
-                      <button
-                        onClick={() => handleRemoveUser(userItem._id)}
-                        className="bg-red-500 px-2 py-1 rounded cursor-pointer"
-                      >
-                        Remove
-                      </button>
-                    )}
-                </div>
-              ))}
+        {room?.roomType === 'private' && room?.allowedUsers?.length > 1 && (
+          <div
+            className="mt-4 flex items-center gap-2 cursor-pointer"
+            onClick={() => setShowInvitedModal(true)}
+          >
+            {/* Avatars */}
+            <div className="flex -space-x-2">
+              {room.allowedUsers
+                .filter(u => u._id !== room.ownerId._id)
+                .slice(0, 3)
+                .map((u) => (
+                  <img
+                    key={u._id}
+                    src={u.avatar}
+                    className="w-8 h-8 rounded-full border-2 border-[#1d1d1d]"
+                  />
+                ))}
+            </div>
+
+            {/* Count */}
+            {room.allowedUsers.length - 1 > 3 && (
+              <span className="text-sm text-gray-400">
+                +{room.allowedUsers.length - 4}
+              </span>
+            )}
+
+            <span className="text-sm text-gray-300 ml-2">
+              Invited Users
+            </span>
           </div>
         )}
+
+
+       
 
         {/* INVITE INPUT */}
         {room?.roomType === 'private' &&
@@ -332,6 +345,51 @@ const Room = () => {
           })}
         </div>
       </div>
+
+      {showInvitedModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+          <div className="bg-[#1f1f1f] p-5 rounded-xl w-[350px] max-h-[400px] overflow-y-auto relative">
+
+            {/* Close */}
+            <button
+              onClick={() => setShowInvitedModal(false)}
+              className="absolute top-2 right-3 text-white text-lg"
+            >
+              ❌
+            </button>
+
+            <h3 className="text-white font-bold mb-4">
+              Invited Users
+            </h3>
+
+            {room.allowedUsers
+              .filter(u => u._id !== room.ownerId._id)
+              .map((u) => (
+                <div
+                  key={u._id}
+                  className="flex items-center justify-between bg-[#262626] px-3 py-2 rounded-lg mb-2"
+                >
+                  <div className="flex items-center gap-3">
+                    <img src={u.avatar} className="w-8 h-8 rounded-full" />
+                    <span className="text-white text-sm">{u.name}</span>
+                  </div>
+
+                  {/* Remove */}
+                  {room.ownerId._id === user.id && (
+                    <button
+                      onClick={() => handleRemoveUser(u._id)}
+                      className="text-red-400 hover:text-red-600 cursor-pointer"
+                    >
+                      🗑️
+                    </button>
+                  )}
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
