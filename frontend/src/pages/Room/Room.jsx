@@ -224,40 +224,48 @@ const Room = () => {
         {/* INVITE INPUT */}
         {room?.roomType === 'private' &&
           room?.ownerId._id === user.id && (
-            <div className="mt-4 flex items-center gap-3 relative">
-              <input
-                type="text"
-                placeholder="Search username"
-                value={query}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="px-3 py-2 rounded bg-[#262626] text-white placeholder-gray-400 outline-none border border-gray-600 w-[250px]"
-              />
+            <div className="mt-4 w-[320px]">
 
-              <button
-                onClick={handleInvite}
-                className="bg-green-500 hover:bg-green-600 px-4 py-2 rounded text-white cursor-pointer"
-              >
-                Invite
-              </button>
+              {/* CHAT STYLE INPUT */}
+              <div className="flex items-center bg-[#262626] rounded-full px-3 py-2 relative">
 
-              {searchResults.length > 0 && (
-                <div className="absolute top-[50px] left-0 bg-[#1f1f1f] w-[250px] rounded border border-gray-700 z-10">
-                  {searchResults.map((u) => (
-                    <div
-                      key={u._id}
-                      onClick={() => {
-                        setInviteId(u.name);
-                        setQuery(u.name);
-                        setSearchResults([]);
-                      }}
-                      className="flex items-center gap-2 p-2 cursor-pointer hover:bg-[#333]"
-                    >
-                      <img src={u.avatar} className="w-6 h-6 rounded-full" alt="" />
-                      <span className="text-white">{u.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+                <input
+                  type="text"
+                  placeholder="Search or invite..."
+                  value={query}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  className="flex-1 bg-transparent text-white outline-none px-2 text-sm"
+                />
+
+                {/* SEND BUTTON */}
+                <button
+                  onClick={handleInvite}
+                  className="bg-green-500 hover:bg-green-600 w-8 h-8 flex items-center justify-center rounded-full text-white cursor-pointer"
+                >
+                  ➤
+                </button>
+
+                {/* DROPDOWN */}
+                {searchResults.length > 0 && (
+                  <div className="absolute bottom-[45px] left-0 w-full bg-[#1f1f1f] rounded-lg border border-gray-700 z-50 max-h-[150px] overflow-y-auto shadow-lg">
+                    {searchResults.map((u) => (
+                      <div
+                        key={u._id}
+                        onClick={() => {
+                          setInviteId(u.name);
+                          setQuery(u.name);
+                          setSearchResults([]);
+                        }}
+                        className="flex items-center gap-3 p-2 cursor-pointer hover:bg-[#333]"
+                      >
+                        <img src={u.avatar} className="w-7 h-7 rounded-full" />
+                        <span className="text-white text-sm">{u.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
             </div>
           )}
 
