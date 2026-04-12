@@ -9,10 +9,10 @@ const RoomCard = ({ room, currentUser }) => {
 
     const navigate = useNavigate();
 
-    // ✅ SAFE ID (handles both id and _id)
+    
     const roomId = room._id || room.id;
 
-    // ✅ OWNER CHECK (handles id + _id + object/string)
+    
     const userId = currentUser?.id || currentUser?._id;
     const ownerId = room.ownerId?._id || room.ownerId;
 
@@ -37,7 +37,7 @@ const RoomCard = ({ room, currentUser }) => {
             onClick={() => navigate(`/room/${roomId}`)}
             className={`${styles.card} relative hover:shadow-lg hover:scale-[1.02] transition-all duration-200`}
         >
-            {/* ✅ DELETE BUTTON (clean + glowing) */}
+            
             {room.roomType === 'social' && isOwner && (
                 <button
                     onClick={handleDelete}
@@ -118,15 +118,7 @@ const RoomCard = ({ room, currentUser }) => {
                 </div>
             </div>
 
-            {/* PEOPLE COUNT */}
-            <div className={`${styles.peopleCount} text-gray-300`}>
-                <span>{room.totalPeople || room.speakers.length}</span>
-                <img
-                    src="/images/user-icon.png"
-                    alt="user-icon"
-                    className="inline ml-1"
-                />
-            </div>
+            
         </div>
     );
 };

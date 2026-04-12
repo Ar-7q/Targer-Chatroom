@@ -40,7 +40,7 @@ const Navigation = () => {
                 <span className="ml-2"> TarGerian </span>
             </Link>
 
-            {/*  ADDED (Right section when logged in) */}
+
             {isAuth && (
                 <div className="flex items-center gap-4">
 
@@ -68,11 +68,15 @@ const Navigation = () => {
                         onClick={logoutUser}
                         className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition"
                     >
-                        <img
-                            src="/images/logout.png"
-                            alt="logout"
-                            className="w-5 h-5"
-                        />
+                        <span>
+                            <img
+                                src="/images/logout.png"
+                                alt="logout"
+                                className="w-5 h-5 cursor-pointer"
+                            />
+
+                            
+                        </span>
                     </button>
                 </div>
             )}

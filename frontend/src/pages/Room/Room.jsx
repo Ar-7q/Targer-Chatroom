@@ -191,6 +191,7 @@ const Room = () => {
               className="bg-[#262626] ml-8 flex items-center px-4 py-2 rounded-2xl text-white hover:bg-[#333333] cursor-pointer"
             >
               <img src="/images/win.png" alt="win-icon" />
+              📞
               <span className="font-bold ml-4">Leave quietly</span>
             </button>
           </div>
@@ -354,7 +355,7 @@ const Room = () => {
             {/* Close */}
             <button
               onClick={() => setShowInvitedModal(false)}
-              className="absolute top-2 right-3 text-white text-lg"
+              className="absolute top-2 right-3 text-white text-lg cursor-pointer"
             >
               ❌
             </button>
