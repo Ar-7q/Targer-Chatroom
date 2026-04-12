@@ -149,7 +149,7 @@ const Rooms = () => {
         <div className="mt-10"></div>
 
         {/* PUBLIC */}
-        {activeTab === 'public' && openRooms.length > 0 && (
+        {activeTab === 'public' && (openRooms.length > 0 ? (
           <>
             <h2 className="text-white text-xl font-semibold mb-4 border-b border-gray-700 pb-2">
               🌍 Public Rooms ({openRooms.length})
@@ -161,10 +161,14 @@ const Rooms = () => {
               ))}
             </div>
           </>
-        )}
+        ) : (
+          <p className="text-gray-400 text-center mt-10">
+            😕 Oops! No rooms found
+          </p>
+        ))}
 
         {/* SOCIAL */}
-        {activeTab === 'social' && socialRooms.length > 0 && (
+        {activeTab === 'social' && (socialRooms.length > 0 ? (
           <>
             <h2 className="text-white text-xl font-semibold mb-4 border-b border-gray-700 pb-2">
               👥 Social Rooms ({socialRooms.length})
@@ -176,10 +180,13 @@ const Rooms = () => {
               ))}
             </div>
           </>
-        )}
+        ) : (<p className="text-gray-400 text-center mt-10">
+          😕 Oops! No rooms found
+        </p>
+        ))}
 
         {/* PRIVATE */}
-        {activeTab === 'private' && privateRooms.length > 0 && (
+        {activeTab === 'private' && (privateRooms.length > 0 ? (
           <>
             <h2 className="text-white text-xl font-semibold mb-4 border-b border-gray-700 pb-2 flex items-center gap-2">
               🔒 Private Rooms ({privateRooms.length})
@@ -192,7 +199,11 @@ const Rooms = () => {
               ))}
             </div>
           </>
-        )}
+        ) : (
+          <p className="text-gray-400 text-center mt-10">
+            🔒 No private rooms found
+          </p>
+        ))}
       </div>
 
       {showModal && <AddRoomModal onClose={() => setShowModal(false)} />}
