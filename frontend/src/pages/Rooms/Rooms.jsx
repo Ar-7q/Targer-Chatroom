@@ -75,7 +75,7 @@ const Rooms = () => {
       <div className="container px-6 py-4">
 
         {/* HEADER */}
-        <div className={`${styles.roomsHeader} mb-6`}>
+        <div className={`${styles.roomsHeader} mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4`}>
           <div className={styles.left}>
             <span className={styles.heading}>All voice rooms</span>
 
@@ -92,9 +92,14 @@ const Rooms = () => {
           </div>
 
           <div className={styles.right}>
-            <button onClick={openModal} className={styles.startRoomButton}>
+            <button
+              onClick={openModal}
+              className={`${styles.startRoomButton} flex items-center gap-2 whitespace-nowrap`}
+            >
               <img src="/images/add-room-icon.png" alt="add-room" />
-              <span>Start a room</span>
+
+              {/* Hide text on very small screens */}
+              <span className="hidden md:inline">Start a room</span>
             </button>
           </div>
         </div>
@@ -128,7 +133,15 @@ const Rooms = () => {
               : 'text-gray-400 hover:text-white'
               }`}
           >
-            🔒 Private ({privateRooms.length})
+            <div className="relative flex items-center gap-2 pr-3">
+              <span>🔒 Private</span>
+
+              {privateRooms.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-2 py-[2px] rounded-full font-bold shadow-md">
+                  {privateRooms.length}
+                </span>
+              )}
+            </div>
           </button>
         </div>
 
