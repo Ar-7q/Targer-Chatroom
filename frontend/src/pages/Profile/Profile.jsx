@@ -22,7 +22,7 @@ const Profile = () => {
     const [otpSent, setOtpSent] = useState(false);
     const [otpLoading, setOtpLoading] = useState(false);
     const [verified, setVerified] = useState(false);
-    
+
     const [editingName, setEditingName] = useState(false);
 
     const [email, setEmail] = useState(user?.email || '');
@@ -30,13 +30,13 @@ const Profile = () => {
     const [editingType, setEditingType] = useState(null); // 'email' or 'phone'
 
     const originalName = user?.name || '';
-    
+
 
     const isChanged = (editingName && name !== originalName) || avatar !== '';
 
-    
+
     useEffect(() => {
-        
+
         setOtpSent(false);
         setOtp('');
         setVerified(false);
@@ -85,16 +85,36 @@ const Profile = () => {
     };
 
     const handleSendOtp = async () => {
-        
-        const currentValue = editingType === 'email' ? email : phone;
 
-        if (!currentValue) return toast.error('Enter value');
+        const currentValue = editingType === 'email' ? email : phone;
+        const cleanContact = currentValue.trim();
+
+        if (!cleanContact) {
+            return toast.error('Enter value');
+        }
+
+        if (editingType === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(cleanContact)) {
+                return toast.error('Enter valid email');
+            }
+        }
+
+        
+        if (editingType === 'phone') {
+            const digits = cleanContact.replace(/\D/g, '');
+
+            if (digits.length !== 10) {
+                return toast.error('Enter valid 10 digit phone number');
+            }
+        }
 
 
         setOtpLoading(true);
 
         try {
-            
+
             const currentValue = editingType === 'email' ? email : phone;
             const cleanContact = currentValue.trim();
 
@@ -137,7 +157,7 @@ const Profile = () => {
             setOtpSent(false);
             setOtp('');
             setVerified(true);
-            setEditingType(null); 
+            setEditingType(null);
 
         } catch (err) {
             console.log("VERIFY ERROR:", err);
@@ -148,10 +168,10 @@ const Profile = () => {
     return (
         <div className="w-[350px] bg-[#1e1f22] text-white rounded-2xl shadow-xl overflow-hidden">
 
-            
+
             <div className="h-20 bg-gradient-to-r from-purple-500 to-indigo-500" />
 
-            
+
             <div className="flex flex-col items-center -mt-10 px-6">
 
                 <label className="cursor-pointer relative group">
@@ -178,7 +198,7 @@ const Profile = () => {
                 </p>
             </div>
 
-            
+
             <div className="px-6 py-5 flex flex-col gap-4">
 
                 {/* Username */}
@@ -196,12 +216,12 @@ const Profile = () => {
                                 }`}
                         />
 
-                        
+
                         <button
                             type="button"
                             onClick={() => {
                                 if (editingName) {
-                                    setName(originalName); 
+                                    setName(originalName);
                                 }
                                 setEditingName(!editingName);
                             }}
@@ -215,7 +235,7 @@ const Profile = () => {
                 {/* Contact Update */}
                 <div>
 
-                    
+
                     <p className="text-xs text-gray-400 mb-1">EMAIL</p>
 
                     <input
@@ -293,7 +313,31 @@ const Profile = () => {
                         >
                             {phone ? 'Update Phone' : 'Add Phone'}
                         </button>
-                    ) : null}
+                    ) : !otpSent ? (
+                        <button
+                            onClick={handleSendOtp}
+                            className="mt-2 w-full py-2 bg-green-600 rounded"
+                        >
+                            Send OTP
+                        </button>
+                    ) : (
+                        <>
+                            <input
+                                type="text"
+                                value={otp}
+                                onChange={(e) => setOtp(e.target.value)}
+                                placeholder="Enter OTP"
+                                className="mt-2 w-full bg-[#2b2d31] border rounded px-3 py-2"
+                            />
+
+                            <button
+                                onClick={handleVerifyOtp}
+                                className="mt-2 w-full py-2 bg-indigo-600 rounded"
+                            >
+                                Verify & Update
+                            </button>
+                        </>
+                    )}
 
                 </div>
 
