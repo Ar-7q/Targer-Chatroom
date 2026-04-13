@@ -101,7 +101,8 @@ const Profile = () => {
             }
         }
 
-        
+        //eddited the phone
+        //and email in it
         if (editingType === 'phone') {
             const digits = cleanContact.replace(/\D/g, '');
 
