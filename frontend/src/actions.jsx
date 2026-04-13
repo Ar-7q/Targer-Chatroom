@@ -17,4 +17,5 @@ export const ACTIONS = {
     ROOM_UPDATED: 'room-updated',
     RAISE_HAND: 'raise-hand',
     LOWER_HAND: 'lower-hand',
+    USER_UPDATED: 'USER_UPDATED',
 };

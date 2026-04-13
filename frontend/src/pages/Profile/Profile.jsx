@@ -3,10 +3,13 @@ import { sendUpdateOtp, updateProfile, verifyUpdateOtp } from '../../http/index'
 import { useDispatch, useSelector } from 'react-redux';
 import { setAuth } from '../../store/authSlice';
 import { toast } from 'sonner';
+import socketInit from '../../socket';
+import { ACTIONS } from '../../actions';
 
 const Profile = () => {
     const { user } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
+    const socket =socketInit()
 
     const [name, setName] = useState(user?.name || '');
     const [avatar, setAvatar] = useState('');
@@ -62,6 +65,11 @@ const Profile = () => {
             const { data } = await updateProfile(payload);
 
             dispatch(setAuth(data));
+
+            socket.emit(ACTIONS.USER_UPDATED, {
+                user: data.user
+            });
+            
             toast.success('Profile updated ✅');
 
         } catch (err) {

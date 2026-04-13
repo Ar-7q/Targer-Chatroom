@@ -100,6 +100,27 @@ io.on('connection', (socket) => {
         console.log(`Clients: ${clients}`); // to see the clients in the socket connection
     });
 
+    socket.on(ACTIONS.USER_UPDATED, ({ user }) => {
+        // 🔥 update latest user data in map
+        socketUserMap.set(socket.id, user);
+
+        const rooms = Array.from(socket.rooms);
+
+        rooms.forEach((roomId) => {
+            if (roomId === socket.id) return;
+
+            const clients = Array.from(io.sockets.adapter.rooms.get(roomId) || []);
+
+            clients.forEach((clientId) => {
+                if (clientId !== socket.id) { // 🔥 ADD THIS
+                    io.to(clientId).emit(ACTIONS.USER_UPDATED, {
+                        user,
+                    });
+                }
+            });
+        });
+    });
+
     socket.on(ACTIONS.RELAY_ICE, ({ peerId, icecandidate }) => {
         io.to(peerId).emit(ACTIONS.ICE_CANDIDATE, {
             peerId: socket.id, // ✅ FIXED

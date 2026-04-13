@@ -19,7 +19,7 @@ const Room = () => {
   const { id: roomId } = useParams();
   const [room, setRoom] = useState(null);
 
-  const { clients, provideRef, handleMute, toggleHand } = useWebRTC(roomId, user);
+  const { clients, setClients, provideRef, handleMute, toggleHand } = useWebRTC(roomId, user);
 
   const navigate = useNavigate();
   const socket = socketInit();
@@ -54,6 +54,27 @@ const Room = () => {
       isActive = false;
     };
   }, [roomId]);
+
+  //for updating the users profile at realtime
+  useEffect(() => {
+    socket.on(ACTIONS.USER_UPDATED, ({ user: updatedUser }) => {
+      console.log('🔥 USER UPDATED:', updatedUser);
+
+      setClients((prevClients) =>
+        prevClients.map((client) =>
+          client.id === updatedUser.id
+            ? { ...client, ...updatedUser } // 🔥 update name/avatar
+            : client
+        )
+      );
+
+
+    });
+
+    return () => {
+      socket.off(ACTIONS.USER_UPDATED);
+    };
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -233,7 +254,7 @@ const Room = () => {
         )}
 
 
-       
+
 
         {/* INVITE INPUT */}
         {room?.roomType === 'private' &&

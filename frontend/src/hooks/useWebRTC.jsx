@@ -521,5 +521,5 @@ export const useWebRTC = (roomId, user) => {
         );
     };
 
-    return { clients, provideRef, handleMute, toggleHand };
+    return { clients, setClients,provideRef, handleMute, toggleHand };
 };
