@@ -68,8 +68,9 @@ class AuthController {
         const hash = hashService.hashOtp(data);
 
         try {
+            //commented these because of the devlopment test
             // if (phone) await otpService.sendBySms(phone, otp); // BLOCKED IT FOR PRE PRODUCTION VERSION TO NOT ADD COST
-            if (normalizedEmail) await otpService.sendByEmail(normalizedEmail, otp);
+            // if (normalizedEmail) await otpService.sendByEmail(normalizedEmail, otp);
 
             return res.json({
                 hash: `${hash}.${expires}`,

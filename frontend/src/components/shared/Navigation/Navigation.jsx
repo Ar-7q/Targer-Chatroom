@@ -60,7 +60,7 @@ const Navigation = () => {
 
                         {/* Username */}
                         <h3 className="text-white text-sm font-medium">
-                            {user?.name}
+                            {`Hello 😀..  ${user?.name}`}
                         </h3>
 
                         {/* Avatar */}
@@ -121,7 +121,7 @@ const Navigation = () => {
                                 onClick={() => setShowProfile(false)}
                                 className="absolute top-2 right-2 text-black"
                             >
-                                ⚔️
+                                <img src='/images/close.png' className="w-10 h-10 cursor-pointer rounded-full  hover:bg-black/80 transition" />
                             </button>
 
                             <Profile />

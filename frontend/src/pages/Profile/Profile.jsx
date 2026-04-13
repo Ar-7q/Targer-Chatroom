@@ -9,30 +9,34 @@ import { ACTIONS } from '../../actions';
 const Profile = () => {
     const { user } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
-    const socket =socketInit()
+    const socket = socketInit()
 
     const [name, setName] = useState(user?.name || '');
     const [avatar, setAvatar] = useState('');
     const [preview, setPreview] = useState(user?.avatar || '');
     const [loading, setLoading] = useState(false);
 
-    const [contact, setContact] = useState(user?.email || user?.phone || '');
+    // const [contact, setContact] = useState(user?.email || user?.phone || '');
     const [otp, setOtp] = useState('');
     const [hash, setHash] = useState('');
     const [otpSent, setOtpSent] = useState(false);
     const [otpLoading, setOtpLoading] = useState(false);
     const [verified, setVerified] = useState(false);
-    const [editingContact, setEditingContact] = useState(false);
+    
     const [editingName, setEditingName] = useState(false);
 
+    const [email, setEmail] = useState(user?.email || '');
+    const [phone, setPhone] = useState(user?.phone || '');
+    const [editingType, setEditingType] = useState(null); // 'email' or 'phone'
+
     const originalName = user?.name || '';
-    const originalContact = user?.email || user?.phone || '';
+    
 
     const isChanged = (editingName && name !== originalName) || avatar !== '';
 
-    // 🔥 reset on mount (good UX)
+    
     useEffect(() => {
-        setEditingContact(false);
+        
         setOtpSent(false);
         setOtp('');
         setVerified(false);
@@ -69,7 +73,7 @@ const Profile = () => {
             socket.emit(ACTIONS.USER_UPDATED, {
                 user: data.user
             });
-            
+
             toast.success('Profile updated ✅');
 
         } catch (err) {
@@ -81,21 +85,22 @@ const Profile = () => {
     };
 
     const handleSendOtp = async () => {
-        if (!contact) return toast.error('Enter phone or email');
+        
+        const currentValue = editingType === 'email' ? email : phone;
 
-        if (contact.trim() === originalContact) {
-            return toast.error('No changes in contact');
-        }
+        if (!currentValue) return toast.error('Enter value');
+
 
         setOtpLoading(true);
 
         try {
-            const cleanContact = contact.trim();
+            
+            const currentValue = editingType === 'email' ? email : phone;
+            const cleanContact = currentValue.trim();
 
-            const payload = cleanContact.includes('@')
+            const payload = editingType === 'email'
                 ? { email: cleanContact }
                 : { phone: cleanContact };
-
             const { data } = await sendUpdateOtp(payload);
 
             setHash(data.hash);
@@ -117,9 +122,10 @@ const Profile = () => {
         if (!otp) return toast.error('Enter OTP');
 
         try {
-            const cleanContact = contact.trim();
+            const currentValue = editingType === 'email' ? email : phone;
+            const cleanContact = currentValue.trim();
 
-            const payload = cleanContact.includes('@')
+            const payload = editingType === 'email'
                 ? { email: cleanContact, otp, hash }
                 : { phone: cleanContact, otp, hash };
 
@@ -131,7 +137,7 @@ const Profile = () => {
             setOtpSent(false);
             setOtp('');
             setVerified(true);
-            setEditingContact(false); // 🔥 important
+            setEditingType(null); // 🔥 important
 
         } catch (err) {
             console.log("VERIFY ERROR:", err);
@@ -208,49 +214,40 @@ const Profile = () => {
 
                 {/* Contact Update */}
                 <div>
-                    <p className="text-xs text-gray-400 mb-1">EMAIL / PHONE</p>
+
+                    {/* EMAIL SECTION */}
+                    <p className="text-xs text-gray-400 mb-1">EMAIL</p>
 
                     <input
                         type="text"
-                        value={contact}
-                        disabled={!editingContact}
-                        onChange={(e) => {
-                            setContact(e.target.value);
-                            setVerified(false);
-                        }}
-                        className={`w-full border rounded px-3 py-2 outline-none ${editingContact
+                        value={email}
+                        disabled={editingType !== 'email'}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className={`w-full border rounded px-3 py-2 outline-none ${editingType === 'email'
                             ? 'bg-[#2b2d31] border-gray-700'
                             : 'bg-gray-800 cursor-not-allowed border-gray-800'
                             }`}
-                        placeholder="Enter phone or email"
+                        placeholder="Enter email"
                     />
 
-                    {/* ✅ Verified Message */}
-                    {verified && (
-                        <p className="text-xs text-green-400 mt-1">
-                            ✅ Contact verified
-                        </p>
-                    )}
-
-                    {!editingContact ? (
+                    {editingType !== 'email' ? (
                         <button
                             onClick={() => {
-                                setEditingContact(true);
+                                setEditingType('email');
                                 setOtpSent(false);
                                 setOtp('');
                                 setVerified(false);
                             }}
-                            className="mt-2 w-full py-2 bg-yellow-600 hover:bg-yellow-700 rounded"
+                            className="mt-2 w-full py-2 bg-yellow-600 rounded"
                         >
-                            Update Contact
+                            {email ? 'Update Email' : 'Add Email'}
                         </button>
                     ) : !otpSent ? (
                         <button
                             onClick={handleSendOtp}
-                            disabled={otpLoading || verified}
-                            className="mt-2 w-full py-2 bg-green-600 hover:bg-green-700 rounded"
+                            className="mt-2 w-full py-2 bg-green-600 rounded"
                         >
-                            {otpLoading ? 'Sending...' : 'Send OTP'}
+                            Send OTP
                         </button>
                     ) : (
                         <>
@@ -259,21 +256,47 @@ const Profile = () => {
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 placeholder="Enter OTP"
-                                className="mt-2 w-full bg-[#2b2d31] border border-gray-700 rounded px-3 py-2"
+                                className="mt-2 w-full bg-[#2b2d31] border rounded px-3 py-2"
                             />
 
                             <button
                                 onClick={handleVerifyOtp}
-                                disabled={verified}
-                                className={`mt-2 w-full py-2 rounded ${verified
-                                    ? 'bg-green-600 cursor-not-allowed'
-                                    : 'bg-indigo-600 hover:bg-indigo-700'
-                                    }`}
+                                className="mt-2 w-full py-2 bg-indigo-600 rounded"
                             >
-                                {verified ? 'Verified 🔒' : 'Verify & Update'}
+                                Verify & Update
                             </button>
                         </>
                     )}
+
+                    {/* PHONE SECTION */}
+                    <p className="text-xs text-gray-400 mt-4 mb-1">PHONE</p>
+
+                    <input
+                        type="text"
+                        value={phone}
+                        disabled={editingType !== 'phone'}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className={`w-full border rounded px-3 py-2 outline-none ${editingType === 'phone'
+                            ? 'bg-[#2b2d31] border-gray-700'
+                            : 'bg-gray-800 cursor-not-allowed border-gray-800'
+                            }`}
+                        placeholder="Enter phone"
+                    />
+
+                    {editingType !== 'phone' ? (
+                        <button
+                            onClick={() => {
+                                setEditingType('phone');
+                                setOtpSent(false);
+                                setOtp('');
+                                setVerified(false);
+                            }}
+                            className="mt-2 w-full py-2 bg-yellow-600 rounded"
+                        >
+                            {phone ? 'Update Phone' : 'Add Phone'}
+                        </button>
+                    ) : null}
+
                 </div>
 
                 {/* Save Profile */}
