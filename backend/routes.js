@@ -20,6 +20,9 @@ router.post('/rooms/:roomId/invite', authMiddleware, roomsController.invite);
 router.post('/rooms/:roomId/remove', authMiddleware, roomsController.removeUser);
 router.post('/rooms/:roomId/leave', authMiddleware, roomsController.leave);
 router.delete('/rooms/:roomId', authMiddleware, roomsController.delete);
+router.post('/profile/update', authMiddleware, userController.updateProfile);
+router.post('/profile/send-otp', authMiddleware, userController.sendUpdateOtp);
+router.post('/profile/verify-otp', authMiddleware, userController.verifyUpdateOtp);
 
 router.get('/users/search', authMiddleware, userController.search);
 

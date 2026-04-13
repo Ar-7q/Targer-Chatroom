@@ -16,6 +16,11 @@ export const sendOtp = (data) => api.post('/send-otp', data);
 export const verifyOtp = (data) => api.post('/verify-otp', data);
 export const activate = (data) => api.post('/activate', data);
 
+export const updateProfile = (data) => api.post('/profile/update', data); //added update profile section
+export const sendUpdateOtp = (data) => api.post('/profile/send-otp', data);
+export const verifyUpdateOtp = (data) => api.post('/profile/verify-otp', data);
+
+
 //ADDED with part-5
 export const logout = () => api.post('/logout');
 
@@ -32,6 +37,8 @@ export const leaveRoom = (roomId) => api.post(`/rooms/${roomId}/leave`);
 export const deleteRoom = (roomId) => api.delete(`/rooms/${roomId}`);
 
 export const searchUsers = (query) => api.get(`/users/search?query=${query}`);
+
+
 
 //  INTERCEPTOR added in part-5
 

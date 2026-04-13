@@ -14,6 +14,7 @@ import Room from './pages/Room/Room';
 import Loader from './components/shared/Loader/Loader';
 import { useLoadingWithRefresh } from './hooks/useLoadingWithRefresh';
 import { Toaster } from 'sonner';
+import Profile from './pages/Profile/Profile';
 
 function App() {
 
@@ -30,15 +31,29 @@ function App() {
             <Navigation />
             <Toaster position='top-right' richColors />
             <Routes>
-                <Route path="/" element={<GuestRoute><Home /></GuestRoute>} />
-                <Route path="/authenticate" element={<GuestRoute><Authenticate /></GuestRoute>} />
-                <Route path="/activate" element={<SemiProtectedRoute><Activate /></SemiProtectedRoute>} />
-                <Route path="/rooms" element={<ProtectedRoute>
-                    <Rooms />
-                </ProtectedRoute>} />
+                <Route path="/" element={
+                    <GuestRoute><Home /></GuestRoute>} />
+                <Route path="/authenticate" element={
+                    <GuestRoute><Authenticate /></GuestRoute>} />
+                <Route path="/activate" element={
+                    <SemiProtectedRoute><Activate /></SemiProtectedRoute>} />
+                <Route path="/rooms" element={
+                    <ProtectedRoute>
+                        <Rooms />
+                    </ProtectedRoute>} />
 
-                {/* ✅ ADDED (single room page) */}
-                <Route path="/room/:id" element={<ProtectedRoute><Room /></ProtectedRoute>} />
+                {/* (single room page) */}
+                <Route path="/room/:id" element={
+                    <ProtectedRoute><Room /></ProtectedRoute>
+                } />
+
+                {/* added the profile page */}
+                <Route path="/profile" element={
+                    <ProtectedRoute>
+                        <Profile />
+                    </ProtectedRoute>
+                }
+                />
             </Routes>
         </BrowserRouter>
     );

@@ -1,18 +1,31 @@
 import { Link } from 'react-router-dom';
-import styles from './Navigation.module.css'; // ✅ kept (you already use it)
+import styles from './Navigation.module.css';
+import { useState } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux'; // ✅ ADDED
-import { logout } from '../../../http/index'; // ⚠️ adjust path if needed
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../../http/index';
 import { setAuth } from '../../../store/authSlice'; // ⚠️ adjust path if needed
+import Profile from '../../../pages/Profile/Profile';
+import { useEffect } from 'react';
 
 const Navigation = () => {
 
     // ✅ ADDED (auth state)
     const { isAuth, user } = useSelector((state) => state.auth);
+    const [showProfile, setShowProfile] = useState(false);
     const dispatch = useDispatch();
 
     console.log('USER DATA:', user);
     console.log('AVATAR:', user?.avatar);
+
+
+    useEffect(() => {
+        if (showProfile) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+    }, [showProfile]);
 
     // ✅ ADDED (logout function)
     async function logoutUser() {
@@ -25,32 +38,33 @@ const Navigation = () => {
     }
 
     return (
-        <nav className={`${styles.navbar} container flex items-center justify-between`}>
+        <>
+            <nav className={`${styles.navbar} container flex items-center justify-between`}>
 
-            {/* Logo */}
-            <Link
-                to="/"
-                className="flex items-center text-white font-bold text-[22px] no-underline"
-            >
-                <img
-                    src="/images/logo.png"
-                    alt="logo"
-                    className="h-8 w-8 object-contain"
-                />
-                <span className="ml-2"> TarGerian </span>
-            </Link>
+                {/* Logo */}
+                <Link
+                    to="/"
+                    className="flex items-center text-white font-bold text-[22px] no-underline"
+                >
+                    <img
+                        src="/images/logo.png"
+                        alt="logo"
+                        className="h-8 w-8 object-contain"
+                    />
+                    <span className="ml-2"> TarGerian </span>
+                </Link>
 
 
-            {isAuth && (
-                <div className="flex items-center gap-4">
+                {isAuth && (
+                    <div className="flex items-center gap-4">
 
-                    {/* Username */}
-                    <h3 className="text-white text-sm font-medium">
-                        {user?.name}
-                    </h3>
+                        {/* Username */}
+                        <h3 className="text-white text-sm font-medium">
+                            {user?.name}
+                        </h3>
 
-                    {/* Avatar */}
-                    <Link to="/">
+                        {/* Avatar */}
+                        {/* <Link to="/profile">
                         <img
                             className="w-10 h-10 rounded-full border border-gray-700 object-cover"
                             src={
@@ -61,26 +75,61 @@ const Navigation = () => {
                             }
                             alt="avatar"
                         />
-                    </Link>
+                    </Link> */}
 
-                    {/* Logout button */}
-                    <button
-                        onClick={logoutUser}
-                        className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition"
+                        <img
+                            onClick={() => setShowProfile(true)}
+                            className="w-10 h-10 rounded-full border border-gray-700 object-cover cursor-pointer"
+                            src={
+                                user?.avatar
+                                    ? user.avatar
+                                    : '/images/monkey-avatar.png'
+                            }
+                            alt="avatar"
+                        />
+
+                        {/* Logout button */}
+                        <button
+                            onClick={logoutUser}
+                            className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition"
+                        >
+                            <span>
+                                <img
+                                    src="/images/logout.png"
+                                    alt="logout"
+                                    className="w-5 h-5 cursor-pointer"
+                                />
+
+
+                            </span>
+                        </button>
+                    </div>
+                )}
+            </nav>
+
+            {
+                showProfile && (
+                    <div
+                        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+                        onClick={() => setShowProfile(false)} // click outside close
                     >
-                        <span>
-                            <img
-                                src="/images/logout.png"
-                                alt="logout"
-                                className="w-5 h-5 cursor-pointer"
-                            />
+                        <div
+                            className="bg-gray-900 text-white p-6 rounded-lg relative w-[350px]"
+                            onClick={(e) => e.stopPropagation()} // prevent close when clicking inside
+                        >
+                            <button
+                                onClick={() => setShowProfile(false)}
+                                className="absolute top-2 right-2 text-black"
+                            >
+                                ⚔️
+                            </button>
 
-                            
-                        </span>
-                    </button>
-                </div>
-            )}
-        </nav>
+                            <Profile />
+                        </div>
+                    </div>
+                )
+            }
+        </>
     );
 };
 
