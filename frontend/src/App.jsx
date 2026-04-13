@@ -8,8 +8,6 @@ import { useSelector } from 'react-redux';
 import Authenticate from './pages/Authenticate/Authenticate';
 import Activate from './pages/Activate/Activate';
 import Rooms from './pages/Rooms/Rooms';
-
-// ✅ ADDED (missing from your code)
 import Room from './pages/Room/Room';
 import Loader from './components/shared/Loader/Loader';
 import { useLoadingWithRefresh } from './hooks/useLoadingWithRefresh';
@@ -18,10 +16,10 @@ import Profile from './pages/Profile/Profile';
 
 function App() {
 
-    // ✅ ADDED (auth persistence)
+    
     const { loading } = useLoadingWithRefresh();
 
-    // ✅ ADDED (loader before app loads)
+    
     if (loading) {
         return <Loader message="Loading, please wait..." />;
     }
@@ -60,7 +58,7 @@ function App() {
 }
 
 
-// ================= ROUTES =================
+//  routes
 
 const GuestRoute = ({ children }) => {
     const { isAuth } = useSelector((state) => state.auth);

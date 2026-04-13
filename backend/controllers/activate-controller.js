@@ -21,8 +21,8 @@ class ActivateController {
         )}.png`;
 
         try {
-            await sharp(buffer) //  REPLACED Jimp
-                .resize(150, 150) // width, height
+            await sharp(buffer) 
+                .resize(150, 150) 
                 .toFile(path.resolve(__dirname, `../storage/${imagePath}`));
         } catch (err) {
             console.error('Sharp error:', err);

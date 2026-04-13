@@ -13,7 +13,7 @@ const socketInit = () => {
         });
 
         socket.on("connect", () => {
-            console.log("✅ Socket connected:", socket.id);
+            console.log(" 🔒Socket connected:", socket.id);
         });
 
         socket.on("connect_error", (err) => {

@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 const AddRoomModal = ({ onClose }) => {
 
 
-    const navigate = useNavigate(); // ✅ FIXED
+    const navigate = useNavigate(); 
 
     const [roomType, setRoomType] = useState('open');
     const [topic, setTopic] = useState('');
@@ -25,11 +25,11 @@ const AddRoomModal = ({ onClose }) => {
             const { data } = await create({ topic, roomType });
             console.log(data);
 
-            navigate(`/room/${data.id}`); // ✅ FIXED
+            navigate(`/room/${data.id}`); 
             onClose()
 
         } catch (err) {
-            toast.error('Room creation failed ❌');
+            toast.error('Room creation failed 🧰');
             console.log(err.message);
         }
     }
@@ -43,7 +43,7 @@ const AddRoomModal = ({ onClose }) => {
 
                 <div className={styles.modalHeader}>
                     <h3 className={styles.heading}>
-                        Enter the topic to be discussed {/* ✅ typo fixed */}
+                        Enter the topic to be discussed
                     </h3>
 
                     <TextInput

@@ -1,9 +1,9 @@
 const RoomDto = require('../dtos/room-dto');
 const roomService = require('../services/room-service');
-const userService = require('../services/user-service'); // ✅ ADD THIS
+const userService = require('../services/user-service'); 
 class RoomsController {
 
-    // ✅ CREATE
+    
     async create(req, res) {
         const { topic, roomType, allowedUsers } = req.body;
 
@@ -21,7 +21,7 @@ class RoomsController {
         return res.json(new RoomDto(room));
     }
 
-    // ✅ GET ALL (MAIN API)
+    
     async index(req, res) {
         const userId = req.user._id;
 
@@ -32,7 +32,7 @@ class RoomsController {
         return res.json(allRooms);
     }
 
-    // ✅ GET SINGLE (SECURE)
+    
     async show(req, res) {
         const room = await roomService.getRoom(
             req.params.roomId,
@@ -60,24 +60,24 @@ class RoomsController {
             return res.status(404).json({ message: 'Room not found or access denied' });
         }
 
-        // 🔒 only owner can invite
+        //only owner can invite
         if (room.ownerId._id.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Only owner can invite users' });
         }
 
-        // 🔒 only private rooms
+        // only private rooms
         if (room.roomType !== 'private') {
             return res.status(400).json({ message: 'Not a private room' });
         }
 
-        // 🔥 convert username → userId
+        //convert username → userId
         const user = await userService.findUser({ name: userIdToAdd });
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // 🔒 prevent duplicate invite (optional but recommended)
+        // prevent duplicate invite (optional but recommended)
         const alreadyExists = room.allowedUsers.some(
             (u) => u.toString() === user._id.toString()
         );
@@ -108,7 +108,7 @@ class RoomsController {
             return res.status(404).json({ message: 'Room not found or access denied' });
         }
 
-        // 🔒 only owner
+        //only owner
         if (room.ownerId._id.toString() !== req.user._id.toString()) {
             return res.status(403).json({ message: 'Only owner can remove users' });
         }
@@ -137,7 +137,7 @@ class RoomsController {
             return res.status(404).json({ message: 'Room not found' });
         }
 
-        // 🔥 if room deleted
+        //if room deleted
         if (result.deleted) {
             return res.json({ message: 'Room deleted by owner' });
         }
@@ -155,7 +155,7 @@ class RoomsController {
                 return res.status(404).json({ message: 'Room not found' });
             }
 
-            // ✅ Only allow delete if:
+            // Only allow delete if:
             // 1. room is social
             // 2. user is owner
             if (room.roomType !== 'social') {

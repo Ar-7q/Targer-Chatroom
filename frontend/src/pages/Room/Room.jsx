@@ -1,9 +1,3 @@
-
-
-
-
-// // FULL CODE OF ROOM.JSX
-
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useWebRTC } from '../../hooks/useWebRTC';
@@ -63,7 +57,7 @@ const Room = () => {
       setClients((prevClients) =>
         prevClients.map((client) =>
           client.id === updatedUser.id
-            ? { ...client, ...updatedUser } // 🔥 update name/avatar
+            ? { ...client, ...updatedUser } 
             : client
         )
       );
@@ -83,7 +77,7 @@ const Room = () => {
 
   const handManualLeave = async () => {
     try {
-      // ✅ FIX: Only close for private & social
+      
       if (
         room?.ownerId?._id === user.id &&
         (room?.roomType === 'private' || room?.roomType === 'social')
@@ -253,15 +247,11 @@ const Room = () => {
           </div>
         )}
 
-
-
-
         {/* INVITE INPUT */}
         {room?.roomType === 'private' &&
           room?.ownerId._id === user.id && (
             <div className="mt-4 w-[320px]">
-
-              {/* CHAT STYLE INPUT */}
+              
               <div className="flex items-center bg-[#262626] rounded-full px-3 py-2 relative">
 
                 <input
@@ -271,8 +261,6 @@ const Room = () => {
                   onChange={(e) => handleSearch(e.target.value)}
                   className="flex-1 bg-transparent text-white outline-none px-2 text-sm"
                 />
-
-                {/* SEND BUTTON */}
                 <button
                   onClick={handleInvite}
                   className="bg-green-500 hover:bg-green-600 w-8 h-8 flex items-center justify-center rounded-full text-white cursor-pointer"
@@ -280,7 +268,6 @@ const Room = () => {
                   ➤
                 </button>
 
-                {/* DROPDOWN */}
                 {searchResults.length > 0 && (
                   <div className="absolute bottom-[45px] left-0 w-full bg-[#1f1f1f] rounded-lg border border-gray-700 z-50 max-h-[150px] overflow-y-auto shadow-lg">
                     {searchResults.map((u) => (
@@ -332,8 +319,6 @@ const Room = () => {
                       ✋
                     </span>
                   )}
-
-                  {/* ✅ FIX: Host only in private/social */}
                   {(room?.roomType === 'private' || room?.roomType === 'social') &&
                     (room?.ownerId?._id || room?.ownerId) === client.id && (
                       <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-violet-600 text-white text-[10px] px-2 py-[2px] rounded-full shadow-md">

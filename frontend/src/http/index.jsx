@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL, // ✅ your Vite style (kept)
+    baseURL: import.meta.env.VITE_API_URL, 
     withCredentials: true,
     headers: {
         'Content-type': 'application/json',
@@ -16,12 +16,12 @@ export const sendOtp = (data) => api.post('/send-otp', data);
 export const verifyOtp = (data) => api.post('/verify-otp', data);
 export const activate = (data) => api.post('/activate', data);
 
-export const updateProfile = (data) => api.post('/profile/update', data); //added update profile section
+export const updateProfile = (data) => api.post('/profile/update', data); 
 export const sendUpdateOtp = (data) => api.post('/profile/send-otp', data);
 export const verifyUpdateOtp = (data) => api.post('/profile/verify-otp', data);
 
 
-//ADDED with part-5
+// with part-5
 export const logout = () => api.post('/logout');
 
 // rooms in  part-5
@@ -40,9 +40,9 @@ export const searchUsers = (query) => api.get(`/users/search?query=${query}`);
 
 
 
-//  INTERCEPTOR added in part-5
 
-// ADDED (auto refresh token) within the part-5
+
+// interceptors (auto refresh token) within the part-5
 api.interceptors.response.use(
     (config) => {
         return config;
@@ -55,7 +55,7 @@ api.interceptors.response.use(
             originalRequest &&
             !originalRequest._isRetry
         ) {
-            originalRequest._isRetry = true; // ✅ FIXED (important)
+            originalRequest._isRetry = true; 
 
             try {
                 await axios.get(

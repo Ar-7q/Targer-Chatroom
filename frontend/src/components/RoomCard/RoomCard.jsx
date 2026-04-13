@@ -60,10 +60,10 @@ const RoomCard = ({ room, currentUser }) => {
                 </button>
             )}
 
-            {/* 🔥 TOP: TOPIC + BADGE */}
+            
             <div className="flex items-start pr-10 gap-2">
 
-                {/* TITLE */}
+                
                 <h3
                     className={`${styles.topic} text-white font-bold flex-1 truncate`}
                     title={room.topic}
@@ -71,7 +71,7 @@ const RoomCard = ({ room, currentUser }) => {
                     {room.topic}
                 </h3>
 
-                {/* BADGE (fixed size, no shrink) */}
+                
                 <span
                     className={`text-xs px-2 py-1 rounded-md text-white capitalize flex-shrink-0 ${room.roomType === 'open'
                             ? 'bg-green-500'
@@ -84,7 +84,7 @@ const RoomCard = ({ room, currentUser }) => {
                 </span>
             </div>
 
-            {/* SPEAKERS */}
+            
             <div
                 className={`${styles.speakers} ${room.speakers.length === 1 ? styles.singleSpeaker : ''
                     }`}

@@ -24,7 +24,7 @@ const roomSchema = new Schema(
             },
         ],
 
-        // 🔒 For private rooms
+        // For private rooms
         allowedUsers: [
             {
                 type: Schema.Types.ObjectId,

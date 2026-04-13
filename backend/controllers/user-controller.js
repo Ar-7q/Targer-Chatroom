@@ -30,7 +30,7 @@ class UserController {
         }
 
         try {
-            // 🔥 check if username already exists
+            //check if username already exists
             const existingUser = await userService.findUser({ name });
 
             if (existingUser && existingUser._id.toString() !== userId.toString()) {
@@ -43,10 +43,10 @@ class UserController {
                 return res.status(404).json({ message: 'User not found' });
             }
 
-            // ✅ update name
+            // update name
             user.name = name;
 
-            // ✅ update avatar (ONLY if provided)
+            //update avatar (if provided)
             if (avatar) {
                 const buffer = Buffer.from(
                     avatar.replace(/^data:image\/\w+;base64,/, ''),
@@ -112,7 +112,8 @@ class UserController {
             //         console.error("SMS failed:", err);
             //         return res.status(500).json({ message: 'SMS failed' });
             //     }
-            // }
+            // } 
+            // do in production uncomment this
 
             return res.json({
                 hash: `${hash}.${expires}`,
@@ -159,7 +160,7 @@ class UserController {
                 return res.status(404).json({ message: 'User not found' });
             }
 
-            // 🔥 DUPLICATE CHECK
+            //DUPLICATE CHECK
             const existingUser = await userService.findUser({
                 $or: [
                     phone ? { phone } : null,
@@ -176,7 +177,7 @@ class UserController {
                 });
             }
 
-            // ✅ UPDATE
+            //UPDATE
             if (phone) user.phone = phone;
             if (normalizedEmail) user.email = normalizedEmail;
 

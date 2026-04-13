@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'; // ✅ added useRef
+import { useState, useEffect, useRef } from 'react'; 
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { setAuth } from '../store/authSlice';
@@ -6,10 +6,10 @@ import { setAuth } from '../store/authSlice';
 export function useLoadingWithRefresh() {
     const [loading, setLoading] = useState(true);
     const dispatch = useDispatch();
-    const effectRan = useRef(false); // ✅ prevent double call
+    const effectRan = useRef(false);
 
     useEffect(() => {
-        if (effectRan.current) return; // ✅ FIX (React Strict Mode issue)
+        if (effectRan.current) return;
         effectRan.current = true;
 
         (async () => {
@@ -23,12 +23,12 @@ export function useLoadingWithRefresh() {
 
                 dispatch(setAuth(data));
             } catch (err) {
-                // ✅ ignore 401 (user not logged in)
+                
                 if (err.response?.status !== 401) {
                     console.error(err); // optional: log other errors
                 }
             } finally {
-                setLoading(false); // ✅ always stop loading
+                setLoading(false); 
             }
         })();
     }, []);

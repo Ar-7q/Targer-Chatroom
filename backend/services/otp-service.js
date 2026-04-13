@@ -28,7 +28,7 @@ class OtpService {
         });
     }
 
-    // ✅ NEW
+    // NEW
     // async sendByEmail(email, otp) {
     //     console.log(`📧 OTP for ${email}: ${otp}`);
     //     return true;

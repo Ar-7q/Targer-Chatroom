@@ -7,7 +7,7 @@ class RoomDto {
     createdAt;
 
     constructor(room) {
-        this.id = room._id?.toString();   // ✅ small fix (safe + frontend friendly)
+        this.id = room._id?.toString();  
         this.topic = room.topic;
         this.roomType = room.roomType;
         this.ownerId = room.ownerId;

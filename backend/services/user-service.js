@@ -17,7 +17,7 @@ class UserService {
             name: { $regex: query, $options: 'i' }
         })
             .select('_id name avatar')
-            .limit(5); // 🔥 IMPORTANT
+            .limit(5); 
     }
 }
 

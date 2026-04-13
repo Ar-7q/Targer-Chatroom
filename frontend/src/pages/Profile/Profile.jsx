@@ -74,7 +74,7 @@ const Profile = () => {
                 user: data.user
             });
 
-            toast.success('Profile updated ✅');
+            toast.success('Profile updated 😊');
 
         } catch (err) {
             console.log("UPDATE ERROR:", err);
@@ -106,7 +106,7 @@ const Profile = () => {
             setHash(data.hash);
             setOtpSent(true);
 
-            toast.success('OTP sent ✅');
+            toast.success('OTP sent 📲');
 
         } catch (err) {
             console.log("OTP ERROR:", err);
@@ -132,12 +132,12 @@ const Profile = () => {
             const { data } = await verifyUpdateOtp(payload);
 
             dispatch(setAuth(data));
-            toast.success('Updated successfully ✅');
+            toast.success('Updated successfully ❤️');
 
             setOtpSent(false);
             setOtp('');
             setVerified(true);
-            setEditingType(null); // 🔥 important
+            setEditingType(null); 
 
         } catch (err) {
             console.log("VERIFY ERROR:", err);
@@ -148,10 +148,10 @@ const Profile = () => {
     return (
         <div className="w-[350px] bg-[#1e1f22] text-white rounded-2xl shadow-xl overflow-hidden">
 
-            {/* Header */}
+            
             <div className="h-20 bg-gradient-to-r from-purple-500 to-indigo-500" />
 
-            {/* Avatar Section */}
+            
             <div className="flex flex-col items-center -mt-10 px-6">
 
                 <label className="cursor-pointer relative group">
@@ -178,7 +178,7 @@ const Profile = () => {
                 </p>
             </div>
 
-            {/* Body */}
+            
             <div className="px-6 py-5 flex flex-col gap-4">
 
                 {/* Username */}
@@ -196,12 +196,12 @@ const Profile = () => {
                                 }`}
                         />
 
-                        {/* ✏️ Edit Button */}
+                        
                         <button
                             type="button"
                             onClick={() => {
                                 if (editingName) {
-                                    setName(originalName); // revert if cancel
+                                    setName(originalName); 
                                 }
                                 setEditingName(!editingName);
                             }}
@@ -215,7 +215,7 @@ const Profile = () => {
                 {/* Contact Update */}
                 <div>
 
-                    {/* EMAIL SECTION */}
+                    
                     <p className="text-xs text-gray-400 mb-1">EMAIL</p>
 
                     <input
@@ -267,8 +267,6 @@ const Profile = () => {
                             </button>
                         </>
                     )}
-
-                    {/* PHONE SECTION */}
                     <p className="text-xs text-gray-400 mt-4 mb-1">PHONE</p>
 
                     <input
@@ -299,7 +297,6 @@ const Profile = () => {
 
                 </div>
 
-                {/* Save Profile */}
                 <button
                     onClick={handleSubmit}
                     disabled={loading || !isChanged}

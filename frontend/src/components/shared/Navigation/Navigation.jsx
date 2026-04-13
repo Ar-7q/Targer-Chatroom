@@ -4,13 +4,13 @@ import { useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../../http/index';
-import { setAuth } from '../../../store/authSlice'; // ⚠️ adjust path if needed
+import { setAuth } from '../../../store/authSlice'; 
 import Profile from '../../../pages/Profile/Profile';
 import { useEffect } from 'react';
 
 const Navigation = () => {
 
-    // ✅ ADDED (auth state)
+    
     const { isAuth, user } = useSelector((state) => state.auth);
     const [showProfile, setShowProfile] = useState(false);
     const dispatch = useDispatch();
@@ -27,11 +27,11 @@ const Navigation = () => {
         }
     }, [showProfile]);
 
-    // ✅ ADDED (logout function)
+    
     async function logoutUser() {
         try {
             await logout();
-            dispatch(setAuth({ user: null })); // ✅ FIXED
+            dispatch(setAuth({ user: null }));
         } catch (err) {
             console.log(err);
         }
@@ -58,24 +58,10 @@ const Navigation = () => {
                 {isAuth && (
                     <div className="flex items-center gap-4">
 
-                        {/* Username */}
+                        
                         <h3 className="text-white text-sm font-medium">
                             {`Hello 😀..  ${user?.name}`}
                         </h3>
-
-                        {/* Avatar */}
-                        {/* <Link to="/profile">
-                        <img
-                            className="w-10 h-10 rounded-full border border-gray-700 object-cover"
-                            src={
-                                user?.avatar
-                                    ? user.avatar
-                                    : '/images/monkey-avatar.png'
-
-                            }
-                            alt="avatar"
-                        />
-                    </Link> */}
 
                         <img
                             onClick={() => setShowProfile(true)}
@@ -88,7 +74,7 @@ const Navigation = () => {
                             alt="avatar"
                         />
 
-                        {/* Logout button */}
+                        
                         <button
                             onClick={logoutUser}
                             className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition"

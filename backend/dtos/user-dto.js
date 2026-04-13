@@ -1,7 +1,7 @@
 class UserDto {
     id;
     phone;
-    email;   // ✅ ADD THIS
+    email;  
     name;
     avatar;
     activated;
@@ -9,8 +9,8 @@ class UserDto {
 
     constructor(user) {
         this.id = user?._id;
-        this.phone = user?.phone || '';   // ✅ safe fallback
-        this.email = user?.email || '';   // ✅ ADD THIS
+        this.phone = user?.phone || '';   
+        this.email = user?.email || '';   
         this.name = user?.name;
         this.avatar = user?.avatar;
         this.activated = user?.activated;

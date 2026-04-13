@@ -26,8 +26,8 @@ const Rooms = () => {
 
     fetchRooms();
 
-    // 🔥 AUTO REFRESH EVERY 3 SECONDS
-    const interval = setInterval(fetchRooms, 1500);
+    
+    const interval = setInterval(fetchRooms, 3000);
 
     return () => clearInterval(interval); // cleanup
   }, []);
@@ -71,7 +71,7 @@ const Rooms = () => {
 
   return (
     <>
-      {/* ✅ Added padding for breathing space */}
+      {/*  Added padding for breathing space */}
       <div className="container px-6 py-4">
 
         {/* HEADER */}
@@ -104,7 +104,7 @@ const Rooms = () => {
           </div>
         </div>
 
-        {/* ✅ TABS (better spacing + Discord feel) */}
+        
         <div className="flex gap-3 mt-6 bg-[#1c1c1c] p-2 rounded-xl w-fit shadow-md">
           <button
             onClick={() => setActiveTab('public')}
@@ -145,7 +145,7 @@ const Rooms = () => {
           </button>
         </div>
 
-        {/* ✅ EXTRA SPACE BETWEEN TABS AND CONTENT */}
+        
         <div className="mt-10"></div>
 
         {/* PUBLIC */}

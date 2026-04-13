@@ -23,7 +23,7 @@ class AuthController {
 
     async sendOtp(req, res) {
 
-        // ✅ Arcjet protection
+        //  Arcjet protection
         const decision = await aj.protect(req);
 
         const otpCooldown = global.otpCooldown || (global.otpCooldown = {});
@@ -46,7 +46,7 @@ class AuthController {
 
         const { phone, email } = req.body;
 
-        // ✅ Email validation
+        //  Email validation
         if (email && !email.includes('@')) {
             return res.status(400).json({ message: 'Invalid email!' });
         }
@@ -55,7 +55,7 @@ class AuthController {
             return res.status(400).json({ message: 'Phone or Email required!' });
         }
 
-        // ✅ Normalize email
+        
         const normalizedEmail = email?.toLowerCase();
 
         const contact = phone || normalizedEmail;
@@ -93,7 +93,7 @@ class AuthController {
             return res.status(400).json({ message: 'All fields are required!' });
         }
 
-        // ✅ Normalize email
+        //  Normalize email
         const normalizedEmail = email?.toLowerCase();
 
         const contact = phone || normalizedEmail;
@@ -104,7 +104,7 @@ class AuthController {
             return res.status(400).json({ message: 'OTP expired!' });
         }
 
-        // ✅ OTP Attempt Limit
+        //  OTP Attempt Limit
         const attempts = global.otpAttempts || (global.otpAttempts = {});
         const key = contact;
 
@@ -122,13 +122,13 @@ class AuthController {
             return res.status(400).json({ message: 'Invalid OTP' });
         }
 
-        // ✅ reset attempts on success
+        //  reset attempts on success
         delete attempts[key];
 
         let user;
 
         try {
-            // ✅ Improved user creation
+            // Improved user creation
             user = await userService.findUser(
                 phone ? { phone } : { email: normalizedEmail }
             );
@@ -162,19 +162,19 @@ class AuthController {
 
         await tokenService.storeRefreshToken(refreshToken, user._id);
 
-        // ✅ Cookie security improved
+        //  Cookie security improved
         res.cookie('refreshToken', refreshToken, {
             maxAge: 1000 * 60 * 60 * 24 * 30,
             httpOnly: true,
             sameSite: 'lax',
-            secure: false, // change to true in production (HTTPS)
+            secure: true, // change to true in production (HTTPS)
         });
 
         res.cookie('accessToken', accessToken, {
             maxAge: 1000 * 60 * 60 * 24 * 30,
             httpOnly: true,
             sameSite: 'lax',
-            secure: false, // change to true in production
+            secure: true, // change to true in production
         });
 
         const userDto = new UserDto(user);

@@ -2,7 +2,7 @@ const RoomModel = require('../models/room-model');
 
 class RoomService {
 
-    // ✅ CREATE ROOM
+
     async create(payload) {
         const { topic, roomType, ownerId, allowedUsers = [] } = payload;
 
@@ -23,20 +23,19 @@ class RoomService {
         return room;
     }
 
-    // ✅ GET ALL ROOMS (CORE LOGIC)
     async getAllRooms(userId) {
         const rooms = await RoomModel.find({
             $or: [
-                // 🌍 PUBLIC
+                // PUBLIC
                 { roomType: 'open' },
 
-                // 👥 SOCIAL → only created by user
+                // SOCIAL  only created by user
                 {
                     roomType: 'social',
                     // ownerId: userId
                 },
 
-                // 🔒 PRIVATE → secure access
+                //PRIVATE  secure access
                 {
                     roomType: 'private',
                     $or: [
@@ -47,23 +46,22 @@ class RoomService {
             ]
         })
             .populate('speakers')
-            .populate('ownerId', '_id name avatar')   // ✅ FIXED
+            .populate('ownerId', '_id name avatar')
             .populate('allowedUsers')
             .exec();
 
         return rooms;
     }
 
-    // ✅ GET SINGLE ROOM (SECURE)
     async getRoom(roomId, userId) {
         const room = await RoomModel.findOne({ _id: roomId })
             .populate('speakers')
-            .populate('ownerId', '_id name avatar')   // ✅ FIXED
+            .populate('ownerId', '_id name avatar')
             .populate('allowedUsers');
 
         if (!room) return null;
 
-        // 🔒 protect private rooms
+        // protect private rooms
         if (room.roomType === 'private') {
             const isAllowed =
                 (room.ownerId._id || room.ownerId).toString() === userId.toString() ||
@@ -82,10 +80,10 @@ class RoomService {
 
         if (!room) return null;
 
-        // 🔒 ensure only private rooms
+        // ensure only private rooms
         if (room.roomType !== 'private') return null;
 
-        // ✅ FIX ObjectId comparison (IMPORTANT)
+        //ObjectId comparison (IMPORTANT)
         const alreadyExists = room.allowedUsers.some(
             (id) => id.toString() === userIdToAdd.toString()
         );
@@ -95,7 +93,7 @@ class RoomService {
             await room.save();
         }
 
-        // ✅ populate before returning (important for DTO)
+        // populate before returning (important for DTO)
         await room.populate('speakers');
         await room.populate('ownerId');
         await room.populate('allowedUsers');
@@ -108,15 +106,15 @@ class RoomService {
 
         if (!room) return null;
 
-        // 🔒 only private rooms
+        // only private rooms
         if (room.roomType !== 'private') return null;
 
-        // ❌ cannot remove owner
+        // cannot remove owner
         if (room.ownerId.toString() === userIdToRemove.toString()) {
             return null;
         }
 
-        // ✅ remove user
+        // remove user
         room.allowedUsers = room.allowedUsers.filter(
             (id) => id.toString() !== userIdToRemove.toString()
         );
@@ -126,7 +124,7 @@ class RoomService {
         // populate
         await room.populate('speakers');
         await room.populate('ownerId');
-        await room.populate('allowedUsers'); // ✅ ADDED
+        await room.populate('allowedUsers');
 
         return room;
     }
@@ -136,7 +134,7 @@ class RoomService {
 
         if (!room) return null;
 
-        // 🔥 DELETE ONLY IF PRIVATE + OWNER
+        // DELETE ONLY IF PRIVATE + OWNER
         if (
             room.roomType === 'private' &&
             room.ownerId.toString() === userId.toString()
@@ -145,7 +143,7 @@ class RoomService {
             return { deleted: true };
         }
 
-        // 🔒 only private rooms need update
+        // only private rooms need update
         if (room.roomType === 'private') {
             room.allowedUsers = room.allowedUsers.filter(
                 (id) => id.toString() !== userId.toString()
