@@ -4,13 +4,13 @@ import { useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../../http/index';
-import { setAuth } from '../../../store/authSlice'; 
+import { setAuth } from '../../../store/authSlice';
 import Profile from '../../../pages/Profile/Profile';
 import { useEffect } from 'react';
 
 const Navigation = () => {
 
-    
+
     const { isAuth, user } = useSelector((state) => state.auth);
     const [showProfile, setShowProfile] = useState(false);
     const dispatch = useDispatch();
@@ -27,7 +27,7 @@ const Navigation = () => {
         }
     }, [showProfile]);
 
-    
+
     async function logoutUser() {
         try {
             await logout();
@@ -58,9 +58,9 @@ const Navigation = () => {
                 {isAuth && (
                     <div className="flex items-center gap-4">
 
-                        
+
                         <h3 className="text-white text-sm font-medium">
-                            {`Hello 😀..  ${user?.name}`}
+                            {user?.name ? `Hello 😀.. ${user.name}` : 'Hello 😀..'}
                         </h3>
 
                         <img
@@ -74,7 +74,7 @@ const Navigation = () => {
                             alt="avatar"
                         />
 
-                        
+
                         <button
                             onClick={logoutUser}
                             className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition"

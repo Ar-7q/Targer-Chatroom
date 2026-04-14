@@ -15,21 +15,23 @@ const Email = ({ onNext }) => {
     const [email, setEmail] = useState('');
     const dispatch = useDispatch();
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     async function submit() {
-        if (disabled) return; // 🚫 prevent spam clicks
+        if (disabled) return; // prevent spam clicks
 
         if (!email) {
             toast.error('Email is Required ❌');
             return;
         }
 
-        if (!email.includes('@')) {
+        if (!emailRegex.test(email)) {
             toast.error('Enter a valid email ❌');
             return;
         }
 
         setLoading(true);
-        setDisabled(true); // 🔥 disable button
+        setDisabled(true); //disable button
 
         try {
             const { data } = await sendOtp({ email });
@@ -62,7 +64,7 @@ const Email = ({ onNext }) => {
                     <Button
                         text={disabled ? "Wait 30s..." : loading ? "Sending..." : "Next"}
                         onClick={submit}
-                        disabled={disabled}
+                        disabled={disabled || !emailRegex.test(email)}
                     />
                 </div>
                 <p className={styles.bottomParagraph}>

@@ -38,7 +38,7 @@ const AddRoomModal = ({ onClose }) => {
         <div className={styles.modalMask}>
             <div className={styles.modalBody}>
                 <button onClick={onClose} className={styles.closeButton}>
-                    <img src="/images/close.png" alt="close" />
+                    <img src="/images/close.png" alt="close" className='h-10 w-10 cursor-pointer' />
                 </button>
 
                 <div className={styles.modalHeader}>
