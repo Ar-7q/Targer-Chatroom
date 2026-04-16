@@ -100,19 +100,21 @@ class UserController {
         const hash = hashService.hashOtp(data);
 
         try {
-            // if (normalizedEmail) {
-            //     await otpService.sendByEmail(normalizedEmail, otp);
-            // }
+            //Remove comments in production
 
-            // optional sms
-            // if (phone) {
-            //     try {
-            //         await otpService.sendBySms(phone, otp);
-            //     } catch (err) {
-            //         console.error("SMS failed:", err);
-            //         return res.status(500).json({ message: 'SMS failed' });
-            //     }
-            // } 
+            if (normalizedEmail) {
+                 await otpService.sendByEmail(normalizedEmail, otp);
+            }
+
+            // optional sms remove comments in production
+            if (phone) {
+                try {
+                    await otpService.sendBySms(phone, otp);
+                } catch (err) {
+                    console.error("SMS failed:", err);
+                    return res.status(500).json({ message: 'SMS failed' });
+                }
+            } 
             // do in production uncomment this
 
             return res.json({

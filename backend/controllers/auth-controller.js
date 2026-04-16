@@ -69,14 +69,14 @@ class AuthController {
 
         try {
             //commented these because of the devlopment test
-            // if (phone) await otpService.sendBySms(phone, otp); // BLOCKED IT FOR PRE PRODUCTION VERSION TO NOT ADD COST
-            // if (normalizedEmail) await otpService.sendByEmail(normalizedEmail, otp);
+            if (phone) await otpService.sendBySms(phone, otp); // BLOCKED IT FOR PRE PRODUCTION VERSION TO NOT ADD COST
+            if (normalizedEmail) await otpService.sendByEmail(normalizedEmail, otp);
 
             return res.json({
                 hash: `${hash}.${expires}`,
                 phone: phone || '',
                 email: normalizedEmail || '',
-                otp, // remove in production
+                //otp , Remove in production 
             });
 
         } catch (err) {
@@ -144,7 +144,7 @@ class AuthController {
                     userData.email = normalizedEmail;
                 }
 
-                // 🔥 EXTRA SAFETY (VERY IMPORTANT)
+                // EXTRA SAFETY (VERY IMPORTANT)
                 if (!phone) delete userData.phone;
                 if (!normalizedEmail) delete userData.email;
 
