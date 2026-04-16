@@ -22,7 +22,9 @@ class RoomService {
 
         return room;
     }
-
+    async findByTopic(topic) {
+        return await RoomModel.findOne({ topic });
+    }
     async getAllRooms(userId) {
         const rooms = await RoomModel.find({
             $or: [

@@ -10,26 +10,35 @@ import { toast } from 'sonner';
 const AddRoomModal = ({ onClose }) => {
 
 
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const [roomType, setRoomType] = useState('open');
     const [topic, setTopic] = useState('');
 
     async function createRoom() {
         try {
-            if (!topic) {
+            if (!topic.trim()) {
                 toast.error('Topic is required ❌');
                 return;
             }
 
-            const { data } = await create({ topic, roomType });
-            console.log(data);
+            const normalizedTopic = topic.trim().toLowerCase();
 
-            navigate(`/room/${data.id}`); 
-            onClose()
+            const { data } = await create({
+                topic: normalizedTopic,
+                roomType
+            });
+
+            navigate(`/room/${data.id}`);
+            onClose();
 
         } catch (err) {
-            toast.error('Room creation failed 🧰');
+            if (err.response?.data?.message === 'ROOM_ALREADY_EXISTS') {
+                toast.error('Room name already exists, kindly choose another name');
+            } else {
+                toast.error('Room creation failed 🧰');
+            }
+
             console.log(err.message);
         }
     }

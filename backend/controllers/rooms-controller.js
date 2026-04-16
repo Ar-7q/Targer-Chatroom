@@ -1,9 +1,9 @@
 const RoomDto = require('../dtos/room-dto');
 const roomService = require('../services/room-service');
-const userService = require('../services/user-service'); 
+const userService = require('../services/user-service');
 class RoomsController {
 
-    
+
     async create(req, res) {
         const { topic, roomType, allowedUsers } = req.body;
 
@@ -11,8 +11,20 @@ class RoomsController {
             return res.status(400).json({ message: 'All fields are required!' });
         }
 
+        // ✅ normalize topic
+        const normalizedTopic = topic.trim().toLowerCase();
+
+        // 🔴 check duplicate
+        const existingRoom = await roomService.findByTopic(normalizedTopic);
+
+        if (existingRoom) {
+            return res.status(400).json({
+                message: 'ROOM_ALREADY_EXISTS',
+            });
+        }
+
         const room = await roomService.create({
-            topic,
+            topic: normalizedTopic,
             roomType,
             ownerId: req.user._id,
             allowedUsers,
@@ -21,7 +33,7 @@ class RoomsController {
         return res.json(new RoomDto(room));
     }
 
-    
+
     async index(req, res) {
         const userId = req.user._id;
 
@@ -32,7 +44,7 @@ class RoomsController {
         return res.json(allRooms);
     }
 
-    
+
     async show(req, res) {
         const room = await roomService.getRoom(
             req.params.roomId,
