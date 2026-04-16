@@ -168,7 +168,7 @@ sequenceDiagram
 
 ## Prerequisites
 
-  * Node.js (v18 or higher)
+  * Node.js (v24 or higher)
   * npm (v8 or higher)
   * Docker
   * Docker Compose
