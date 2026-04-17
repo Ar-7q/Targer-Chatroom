@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'; 
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { setAuth } from '../store/authSlice';
@@ -21,14 +21,11 @@ export function useLoadingWithRefresh() {
                     }
                 );
 
-                dispatch(setAuth(data));
+                dispatch(setAuth(data)); // always works now
             } catch (err) {
-                
-                if (err.response?.status !== 401) {
-                    console.error(err); // optional: log other errors
-                }
+                console.error(err); // optional
             } finally {
-                setLoading(false); 
+                setLoading(false);
             }
         })();
     }, []);

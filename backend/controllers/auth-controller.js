@@ -44,6 +44,8 @@ class AuthController {
             });
         }
 
+
+
         const { phone, email } = req.body;
 
         //  Email validation
@@ -55,7 +57,7 @@ class AuthController {
             return res.status(400).json({ message: 'Phone or Email required!' });
         }
 
-        
+
         const normalizedEmail = email?.toLowerCase();
 
         const contact = phone || normalizedEmail;
@@ -167,14 +169,14 @@ class AuthController {
             maxAge: 1000 * 60 * 60 * 24 * 30,
             httpOnly: true,
             sameSite: 'lax',
-            secure: true, // change to true in production (HTTPS)
+            secure: false, // change to true in production (HTTPS)
         });
 
         res.cookie('accessToken', accessToken, {
             maxAge: 1000 * 60 * 60 * 24 * 30,
             httpOnly: true,
             sameSite: 'lax',
-            secure: true, // change to true in production
+            secure: false, // change to true in production
         });
 
         const userDto = new UserDto(user);
@@ -186,7 +188,7 @@ class AuthController {
         const { refreshToken: refreshTokenFromCookie } = req.cookies;
 
         if (!refreshTokenFromCookie) {
-            return res.status(401).json({ message: 'No token' });
+            return res.json({ user: null, auth: false });
         }
 
         let userData;
@@ -196,7 +198,7 @@ class AuthController {
             );
         } catch (err) {
             console.error(err);
-            return res.status(401).json({ message: 'Invalid Token' });
+            return res.json({ user: null, auth: false });
         }
 
         try {
@@ -205,19 +207,23 @@ class AuthController {
                 refreshTokenFromCookie
             );
 
+
             if (!token) {
-                return res.status(401).json({ message: 'Invalid token' });
+                return res.json({ user: null, auth: false });
             }
+
         } catch (err) {
             console.error(err);
-            return res.status(500).json({ message: 'Internal error' });
+            return res.json({ user: null, auth: false });
         }
 
         const user = await userService.findUser({ _id: userData._id });
 
+
         if (!user) {
-            return res.status(404).json({ message: 'No user' });
+            return res.json({ user: null, auth: false });
         }
+
 
         const { refreshToken, accessToken } = tokenService.generateTokens({
             _id: userData._id,
@@ -227,7 +233,7 @@ class AuthController {
             await tokenService.updateRefreshToken(userData._id, refreshToken);
         } catch (err) {
             console.error(err);
-            return res.status(500).json({ message: 'Internal error' });
+            return res.json({ user: null, auth: false });
         }
 
         res.cookie('refreshToken', refreshToken, {

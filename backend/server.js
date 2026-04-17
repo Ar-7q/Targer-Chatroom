@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -18,11 +19,23 @@ const { dbConnect } = require('./database');
 const router = require('./routes');
 
 // middlewares
-app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+const corsOptions = {
+    origin: "http://localhost:5173",
     credentials: true,
-}));
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+};
 
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+    res.header("Access-Control-Allow-Credentials", "true");
+    next();
+});
+
+app.use(cors(corsOptions));
+app.options('*', cors()); // ⭐ IMPORTANT
+
+//for avtar image
 app.use('/storage', express.static('storage'));
 app.use(express.json({ limit: '8mb' }));
 app.use(cookieParser());
