@@ -179,7 +179,7 @@ All configuration is managed through environment variables in the `backend/.env`
 
 | Variable | Description | Default Value |
 | --- | --- | --- |
-| `PORT` | The port the backend server will run on. | `3000` |
+| `PORT` | The port the backend server will run on. | `5000` |
 | `FRONTEND_URL` | The URL of the frontend application. | `http://localhost:5173` |
 | `DATABASE_URL` | The connection string for the MongoDB database.| `mongodb://mongo:27017/hlloDB`|
 | `JWT_ACCESS_SECRET` | The secret key for signing JWT access tokens.| `your_access_secret` |
