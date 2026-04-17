@@ -49,29 +49,44 @@ const Email = ({ onNext }) => {
 
         setLoading(false);
 
-        // ⏳ enable button after 30 sec
+        // enable button after 30 sec
         setTimeout(() => setDisabled(false), 30000);
     }
 
     return (
         <Card title="Enter your email id" icon="email-emoji">
-            <TextInput
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-            />
-            <div>
-                <div className={styles.actionButtonWrap}>
-                    <Button
-                        text={disabled ? "Wait 30s..." : loading ? "Sending..." : "Next"}
-                        onClick={submit}
-                        disabled={disabled || !emailRegex.test(email)}
+
+            <div className="w-full flex flex-col items-center">
+
+                {/* Input */}
+                <div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
+                    <TextInput
+                        
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
                 </div>
-                <p className={styles.bottomParagraph}>
-                    By entering your email, you’re agreeing to our Terms of
-                    Service and Privacy Policy. Thanks!
-                </p>
+
+                {/* Button + Text */}
+                <div className="w-full max-w-xs sm:max-w-sm md:max-w-md mt-4">
+
+                    <div className={styles.actionButtonWrap}>
+                        <Button
+                            text={disabled ? "Wait 30s..." : loading ? "Sending..." : "Next"}
+                            onClick={submit}
+                            disabled={disabled || !emailRegex.test(email)}
+                        />
+                    </div>
+
+                    <p className={`${styles.bottomParagraph} text-center text-xs sm:text-sm px-2`}>
+                        By entering your email, you’re agreeing to our Terms of
+                        Service and Privacy Policy. Thanks!
+                    </p>
+
+                </div>
+
             </div>
+
         </Card>
     );
 };

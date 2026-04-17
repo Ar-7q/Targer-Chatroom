@@ -1,5 +1,9 @@
 .button {
+    width: 100%;
+    /* ✅ makes it responsive */
+    display: flex;
     background: #0077ff;
+    justify-content: center;
     padding: 10px 20px;
     border: none;
     outline: none;
@@ -13,9 +17,16 @@
     cursor: pointer;
     transition: all 0.3s ease-in-out;
 }
+
+.button img {
+    width: 18px;
+    height: 18px;
+}
+
 .button:hover {
     background: #014a9c;
 }
+
 .arrow {
     margin-left: 10px;
 }

@@ -47,30 +47,43 @@ const Phone = ({ onNext }) => {
 
     return (
         <Card title="Enter your phone number" icon="phone">
-            <PhoneInput
-                className={styles.phoneInput}
-                placeholder="Enter phone number"
-                value={phone}
-                onChange={setPhone}
-                defaultCountry="IN"
-            />
 
-            <div>
-                <div className={styles.actionButtonWrap}>
-                    <Button
-                        text="Next"
-                        onClick={submit}
-                        disabled={!phone || phone.replace(/\D/g, '').length !== 12}
+            <div className="w-full flex flex-col items-center">
+
+                {/* Phone Input Wrapper */}
+                <div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
+                    <PhoneInput
+                        className={`${styles.phoneInput} w-full`}
+                        placeholder="Enter phone number"
+                        value={phone}
+                        onChange={setPhone}
+                        defaultCountry="IN"
                     />
                 </div>
 
-                <p className={styles.bottomParagraph}>
-                    By entering your number, you’re agreeing to our Terms of
-                    Service and Privacy Policy. Thanks!
-                </p>
+                {/* Button + Text */}
+                <div className="w-full max-w-xs sm:max-w-sm md:max-w-md mt-4">
+
+                    <div className={styles.actionButtonWrap}>
+                        <Button
+                            text="Next"
+                            onClick={submit}
+                            disabled={!phone || phone.replace(/\D/g, '').length !== 12}
+                        />
+                    </div>
+
+                    <p className={`${styles.bottomParagraph} text-center text-xs sm:text-sm px-2`}>
+                        By entering your number, you’re agreeing to our Terms of
+                        Service and Privacy Policy. Thanks!
+                    </p>
+
+                </div>
+
             </div>
+
         </Card>
     );
+
 };
 
 export default Phone;
