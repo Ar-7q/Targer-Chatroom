@@ -36,7 +36,9 @@ app.use(cors(corsOptions));
 app.options('*', cors()); // ⭐ IMPORTANT
 
 //for avtar image
-app.use('/storage', express.static('storage'));
+const path = require('path');
+app.use('/storage', express.static(path.join(__dirname, 'storage')));
+
 app.use(express.json({ limit: '8mb' }));
 app.use(cookieParser());
 

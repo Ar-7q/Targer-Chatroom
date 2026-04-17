@@ -1,0 +1,23 @@
+# dependencies
+node_modules
+
+# build output
+dist
+build
+
+# env files
+.env
+.env.local
+.env.*.local
+
+# logs
+npm-debug.log
+yarn-error.log
+
+# git
+.git
+.gitignore
+
+# OS files
+.DS_Store
+Thumbs.db

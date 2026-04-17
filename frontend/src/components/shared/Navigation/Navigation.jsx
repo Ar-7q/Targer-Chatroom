@@ -15,8 +15,8 @@ const Navigation = () => {
     const [showProfile, setShowProfile] = useState(false);
     const dispatch = useDispatch();
 
-    console.log('USER DATA:', user);
-    console.log('AVATAR:', user?.avatar);
+    // console.log('USER DATA:', user);
+    // console.log('AVATAR:', user?.avatar);
 
 
     useEffect(() => {
@@ -36,6 +36,12 @@ const Navigation = () => {
             console.log(err);
         }
     }
+
+    const avatarUrl = user?.avatar
+        ? new URL(user.avatar.replace(/\s/g, ''), "http://localhost:5000").href
+        : "/images/monkey-avatar.png";
+
+    console.log("FINAL AVATAR URL:", avatarUrl);
 
     return (
         <>
@@ -66,13 +72,11 @@ const Navigation = () => {
                         <img
                             onClick={() => setShowProfile(true)}
                             className="w-10 h-10 rounded-full border border-gray-700 object-cover cursor-pointer"
-                            src={
-                                user?.avatar
-                                    ? user.avatar
-                                    : '/images/monkey-avatar.png'
-                            }
+                            src={avatarUrl}
                             alt="avatar"
                         />
+
+
 
 
                         <button

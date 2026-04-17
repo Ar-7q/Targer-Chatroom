@@ -40,7 +40,7 @@ class ActivateController {
 
             user.activated = true;
             user.name = name;
-            user.avatar = `/storage/${imagePath}`;
+            user.avatar = `/storage/${imagePath}`.trim();
 
             await user.save();
 
