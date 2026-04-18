@@ -9,7 +9,7 @@ const server = require('http').createServer(app);
 
 const io = require('socket.io')(server, {
     cors: {
-        origin: process.env.FRONTEND_URL || "http://localhost:5173",
+        origin: process.env.FRONTEND_URL,
         methods: ['GET', 'POST'],
         credentials: true,
     },
@@ -19,21 +19,10 @@ const { dbConnect } = require('./database');
 const router = require('./routes');
 
 // middlewares
-const corsOptions = {
-    origin: "http://localhost:5173",
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-};
-
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "http://localhost:5173");
-    res.header("Access-Control-Allow-Credentials", "true");
-    next();
-});
-
-app.use(cors(corsOptions));
-app.options('*', cors()); // ⭐ IMPORTANT
+}));
 
 //for avtar image
 const path = require('path');
