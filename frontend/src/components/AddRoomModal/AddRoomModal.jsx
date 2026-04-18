@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
-import styles from './AddRoomModal.module.css';
 import TextInput from '../shared/TextInput/TextInput';
 import { createRoom as create } from '../../http';
-
-
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const AddRoomModal = ({ onClose }) => {
-
-
     const navigate = useNavigate();
 
     const [roomType, setRoomType] = useState('open');
@@ -44,14 +39,24 @@ const AddRoomModal = ({ onClose }) => {
     }
 
     return (
-        <div className={styles.modalMask}>
-            <div className={styles.modalBody}>
-                <button onClick={onClose} className={styles.closeButton}>
-                    <img src="/images/close.png" alt="close" className='h-10 w-10 cursor-pointer' />
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center px-4 z-50">
+            <div className="bg-[#1d1d1d] w-full max-w-md rounded-2xl p-6 relative">
+
+                {/* Close Button */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4"
+                >
+                    <img
+                        src="/images/close.png"
+                        alt="close"
+                        className="h-8 w-8 cursor-pointer"
+                    />
                 </button>
 
-                <div className={styles.modalHeader}>
-                    <h3 className={styles.heading}>
+                {/* Header */}
+                <div className="flex flex-col gap-4">
+                    <h3 className="text-white text-lg sm:text-xl font-semibold text-center">
                         Enter the topic to be discussed
                     </h3>
 
@@ -61,49 +66,52 @@ const AddRoomModal = ({ onClose }) => {
                         onChange={(e) => setTopic(e.target.value)}
                     />
 
-                    <h2 className={styles.subHeading}>Room types</h2>
+                    <h2 className="text-gray-300 text-md font-medium">
+                        Room types
+                    </h2>
 
-                    <div className={styles.roomTypes}>
-                        <div
-                            onClick={() => setRoomType('open')}
-                            className={`${styles.typeBox} ${roomType === 'open' ? styles.active : ''
-                                }`}
-                        >
-                            <img src="/images/globe.png" alt="globe" />
-                            <span>Open</span>
-                        </div>
-
-                        <div
-                            onClick={() => setRoomType('social')}
-                            className={`${styles.typeBox} ${roomType === 'social' ? styles.active : ''
-                                }`}
-                        >
-                            <img src="/images/social.png" alt="social" />
-                            <span>Social</span>
-                        </div>
-
-                        <div
-                            onClick={() => setRoomType('private')}
-                            className={`${styles.typeBox} ${roomType === 'private' ? styles.active : ''
-                                }`}
-                        >
-                            <img src="/images/lock.png" alt="lock" />
-                            <span>Private</span>
-                        </div>
+                    {/* Room Types */}
+                    <div className="grid grid-cols-3 gap-3">
+                        {[
+                            { type: 'open', img: '/images/globe.png', label: 'Open' },
+                            { type: 'social', img: '/images/social.png', label: 'Social' },
+                            { type: 'private', img: '/images/lock.png', label: 'Private' },
+                        ].map((item) => (
+                            <div
+                                key={item.type}
+                                onClick={() => setRoomType(item.type)}
+                                className={`flex flex-col items-center justify-center p-3 rounded-xl cursor-pointer border transition 
+                                ${roomType === item.type
+                                        ? 'bg-blue-500/20 border-blue-500'
+                                        : 'bg-[#2a2a2a] border-transparent hover:bg-[#333]'
+                                    }`}
+                            >
+                                <img src={item.img} alt={item.label} className="h-8 w-8 mb-1" />
+                                <span className="text-sm text-white">{item.label}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                <div className={styles.modalFooter}>
-                    <h2>Start a room, open to everyone</h2>
+                {/* Footer */}
+                <div className="mt-6 flex flex-col gap-4">
+                    <h2 className="text-gray-400 text-sm text-center">
+                        Start a room, open to everyone
+                    </h2>
 
                     <button
                         onClick={createRoom}
-                        className={styles.footerButton}
+                        className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 transition text-white font-medium py-3 rounded-xl w-full"
                     >
-                        <img src="/images/celebration.png" alt="celebration" />
+                        <img
+                            src="/images/celebration.png"
+                            alt="celebration"
+                            className="h-5 w-5"
+                        />
                         <span>Let's go</span>
                     </button>
                 </div>
+
             </div>
         </div>
     );
