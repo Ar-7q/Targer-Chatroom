@@ -75,20 +75,21 @@ const Profile = () => {
         }
     };
 
-    const handleSendOtp = async () => {
-        const currentValue = editingType === 'email' ? email : phone;
+    // ✅ unchanged logic (already correct)
+    const handleSendOtp = async (type) => {
+        const currentValue = type === 'email' ? email : phone;
         const cleanContact = currentValue.trim();
 
         if (!cleanContact) return toast.error('Enter value');
 
-        if (editingType === 'email') {
+        if (type === 'email') {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(cleanContact)) {
                 return toast.error('Enter valid email');
             }
         }
 
-        if (editingType === 'phone') {
+        if (type === 'phone') {
             const digits = cleanContact.replace(/\D/g, '');
             if (digits.length !== 10) {
                 return toast.error('Enter valid 10 digit phone number');
@@ -99,9 +100,9 @@ const Profile = () => {
 
         try {
             const payload =
-                editingType === 'email'
+                type === 'email'
                     ? { email: cleanContact }
-                    : { phone: cleanContact };
+                    : { phone: "+91" + cleanContact.replace(/\D/g, '') };
 
             const { data } = await sendUpdateOtp(payload);
             setHash(data.hash);
@@ -125,7 +126,7 @@ const Profile = () => {
             const payload =
                 editingType === 'email'
                     ? { email: cleanContact, otp, hash }
-                    : { phone: cleanContact, otp, hash };
+                    : { phone: "+91" + cleanContact.replace(/\D/g, ''), otp, hash };
 
             const { data } = await verifyUpdateOtp(payload);
 
@@ -186,8 +187,8 @@ const Profile = () => {
                             disabled={!editingName}
                             onChange={(e) => setName(e.target.value)}
                             className={`w-full text-sm md:text-base border rounded px-3 py-2 outline-none ${editingName
-                                    ? 'bg-[#2b2d31] border-gray-700'
-                                    : 'bg-gray-800 cursor-not-allowed border-gray-800'
+                                ? 'bg-[#2b2d31] border-gray-700'
+                                : 'bg-gray-800 cursor-not-allowed border-gray-800'
                                 }`}
                         />
 
@@ -214,40 +215,113 @@ const Profile = () => {
                         className="w-full text-sm md:text-base border rounded px-3 py-2 outline-none bg-[#2b2d31]"
                     />
 
+                    {/* Edit button */}
                     <button
-                        onClick={() => setEditingType('email')}
+                        onClick={() => {
+                            setEditingType('email');
+                            setOtpSent(false);
+                            setOtp('');
+                        }}
                         className="mt-2 w-full py-2 bg-yellow-600 rounded text-sm"
                     >
                         Update Email
                     </button>
+
+                    {/* Send OTP */}
+                    {editingType === 'email' && !otpSent && (
+                        <button
+                            onClick={() => handleSendOtp('email')}
+                            className="mt-2 w-full py-2 bg-blue-600 rounded text-sm"
+                        >
+                            Send OTP
+                        </button>
+                    )}
                 </div>
 
                 {/* PHONE */}
                 <div>
                     <p className="text-xs text-gray-400 mb-1">PHONE</p>
-                    <input
-                        type="text"
-                        value={phone}
-                        disabled={editingType !== 'phone'}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="w-full text-sm md:text-base border rounded px-3 py-2 outline-none bg-[#2b2d31]"
-                    />
+                    <div className="flex items-center">
+                        {/* Flag only */}
+                        <div className="px-3 py-2 bg-[#2b2d31] border border-r-0 rounded-l flex items-center">
+                            <span className="text-lg">🇮🇳</span>
+                        </div>
 
+                        {/* Input */}
+                        <input
+                            type="text"
+                            value={phone}
+                            disabled={editingType !== 'phone'}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                setPhone(value);
+                            }}
+                            placeholder="Enter 10 digit number"
+                            className="w-full text-sm md:text-base border rounded-r px-3 py-2 outline-none bg-[#2b2d31]"
+                        />
+                    </div>
+
+                    {/* Edit button */}
                     <button
-                        onClick={() => setEditingType('phone')}
+                        onClick={() => {
+                            setEditingType('phone');
+                            setOtpSent(false);
+                            setOtp('');
+                        }}
                         className="mt-2 w-full py-2 bg-yellow-600 rounded text-sm"
                     >
                         Update Phone
                     </button>
+
+                    {/* Send OTP */}
+                    {editingType === 'phone' && !otpSent && (
+                        <button
+                            onClick={() => handleSendOtp('phone')}
+                            className="mt-2 w-full py-2 bg-blue-600 rounded text-sm"
+                        >
+                            Send OTP
+                        </button>
+                    )}
                 </div>
+
+                {/* OTP SECTION */}
+                {otpSent && (
+                    <div>
+                        <input
+                            type="text"
+                            placeholder="Enter OTP"
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                            className="w-full mt-2 px-3 py-2 rounded bg-[#2b2d31]"
+                        />
+
+                        <button
+                            onClick={handleVerifyOtp}
+                            className="mt-2 w-full py-2 bg-green-600 rounded"
+                        >
+                            Verify OTP
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                setEditingType(null);
+                                setOtpSent(false);
+                                setOtp('');
+                            }}
+                            className="mt-2 w-full py-2 bg-gray-600 rounded"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                )}
 
                 {/* SAVE */}
                 <button
                     onClick={handleSubmit}
                     disabled={loading || !isChanged}
                     className={`w-full py-2 rounded text-sm md:text-base ${loading || !isChanged
-                            ? 'bg-gray-600'
-                            : 'bg-indigo-600 hover:bg-indigo-700'
+                        ? 'bg-gray-600'
+                        : 'bg-indigo-600 hover:bg-indigo-700'
                         }`}
                 >
                     {loading ? 'Updating...' : 'Save Changes'}
