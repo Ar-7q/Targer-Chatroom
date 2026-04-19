@@ -2,6 +2,7 @@ const sharp = require('sharp'); // removed jimp as it is outdated
 const path = require('path');
 const userService = require('../services/user-service');
 const UserDto = require('../dtos/user-dto');
+const cloudinary = require('../utils/cloudinary')
 
 class ActivateController {
     async activate(req, res) {
@@ -16,16 +17,30 @@ class ActivateController {
             'base64'
         );
 
-        const imagePath = `${Date.now()}-${Math.round(
-            Math.random() * 1e9
-        )}.png`;
+        let result;
 
         try {
-            await sharp(buffer) 
-                .resize(150, 150) 
-                .toFile(path.resolve(__dirname, `../storage/${imagePath}`));
+            const processedBuffer = await sharp(buffer)
+                .resize(150, 150)
+                .jpeg({ quality: 60 }) // compression
+                .toBuffer();
+
+            result = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: "ArpitBackend/avatars",
+                        public_id: `avatar_${Date.now()}`
+                    },
+                    (error, result) => {
+                        if (result) resolve(result);
+                        else reject(error);
+                    }
+                );
+                stream.end(processedBuffer);
+            });
+
         } catch (err) {
-            console.error('Sharp error:', err);
+            console.error('Upload error:', err);
             return res.status(500).json({ message: 'Could not process the image' });
         }
 
@@ -40,7 +55,7 @@ class ActivateController {
 
             user.activated = true;
             user.name = name;
-            user.avatar = `/storage/${imagePath}`.trim();
+            user.avatar = result.secure_url;
 
             await user.save();
 

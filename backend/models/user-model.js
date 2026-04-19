@@ -18,9 +18,7 @@ const userSchema = new Schema(
          },
         avatar: {
             type: String,
-            get: (avatar) => {
-                return avatar ? `${process.env.BASE_URL}${avatar}` : avatar;
-            },
+            
         },
         activated: {
             type: Boolean,

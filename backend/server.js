@@ -24,9 +24,9 @@ app.use(cors({
     credentials: true,
 }));
 
-//for avtar image
-const path = require('path');
-app.use('/storage', express.static(path.join(__dirname, 'storage')));
+//for avtar image when you needed to store in local storage
+//const path = require('path');
+// app.use('/storage', express.static(path.join(__dirname, 'storage')));
 
 app.use(express.json({ limit: '8mb' }));
 app.use(cookieParser());
