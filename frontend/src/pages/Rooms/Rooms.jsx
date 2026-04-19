@@ -95,10 +95,12 @@ const Rooms = () => {
           <div className="flex justify-end">
             <button
               onClick={openModal}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg text-sm whitespace-nowrap"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 
+               px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm 
+               w-auto max-w-full"
             >
               <img src="/images/add-room-icon.png" alt="add-room" className="w-4 h-4" />
-              <span className="hidden sm:inline">Start a room</span>
+              <span className="hidden sm:inline">Launch 🚀 Room</span>
             </button>
           </div>
         </div>
