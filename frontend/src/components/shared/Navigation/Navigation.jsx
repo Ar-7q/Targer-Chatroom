@@ -29,9 +29,8 @@ const Navigation = () => {
             console.log(err);
         }
     }
-
-    const avatarUrl = user?.avatar
-        ? new URL(user.avatar.replace(/\s/g, ''), "http://localhost:5000").href
+    const avatarUrl = user?.avatar?.trim()
+        ? user.avatar.trim()
         : "/images/monkey-avatar.png";
 
     return (
